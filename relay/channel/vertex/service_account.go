@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,7 +12,6 @@ import (
 	relaycommon "new-api-demo/relay/common"
 	"new-api-demo/service"
 
-	"github.com/bytedance/gopkg/cache/asynccache"
 	"github.com/golang-jwt/jwt/v5"
 
 	"fmt"
@@ -28,40 +26,41 @@ type Credentials struct {
 	ClientID     string `json:"client_id"`
 }
 
-var Cache = asynccache.NewAsyncCache(asynccache.Options{
-	RefreshDuration: time.Minute * 35,
-	EnableExpire:    true,
-	ExpireDuration:  time.Minute * 30,
-	Fetcher: func(key string) (interface{}, error) {
-		return nil, errors.New("not found")
-	},
-})
-
-func getAccessToken(a *Adaptor, info *relaycommon.RelayInfo) (string, error) {
-	var cacheKey string
-	if info.ChannelIsMultiKey {
-		cacheKey = fmt.Sprintf("access-token-%d-%d", info.ChannelId, info.ChannelMultiKeyIndex)
-	} else {
-		cacheKey = fmt.Sprintf("access-token-%d", info.ChannelId)
-	}
-	val, err := Cache.Get(cacheKey)
-	if err == nil {
-		return val.(string), nil
-	}
-
-	signedJWT, err := createSignedJWT(a.AccountCredentials.ClientEmail, a.AccountCredentials.PrivateKey)
-	if err != nil {
-		return "", fmt.Errorf("failed to create signed JWT: %w", err)
-	}
-	newToken, err := exchangeJwtForAccessToken(signedJWT, info)
-	if err != nil {
-		return "", fmt.Errorf("failed to exchange JWT for access token: %w", err)
-	}
-	if err := Cache.SetDefault(cacheKey, newToken); err {
-		return newToken, nil
-	}
-	return newToken, nil
-}
+//var Cache = asynccache.NewAsyncCache(asynccache.Options{
+//	RefreshDuration: time.Minute * 35,
+//	EnableExpire:    true,
+//	ExpireDuration:  time.Minute * 30,
+//	Fetcher: func(key string) (interface{}, error) {
+//		return nil, errors.New("not found")
+//	},
+//})
+//
+//
+//func getAccessToken(a *Adaptor, info *relaycommon.RelayInfo) (string, error) {
+//	var cacheKey string
+//	if info.ChannelIsMultiKey {
+//		cacheKey = fmt.Sprintf("access-token-%d-%d", info.ChannelId, info.ChannelMultiKeyIndex)
+//	} else {
+//		cacheKey = fmt.Sprintf("access-token-%d", info.ChannelId)
+//	}
+//	val, err := Cache.Get(cacheKey)
+//	if err == nil {
+//		return val.(string), nil
+//	}
+//
+//	signedJWT, err := createSignedJWT(a.AccountCredentials.ClientEmail, a.AccountCredentials.PrivateKey)
+//	if err != nil {
+//		return "", fmt.Errorf("failed to create signed JWT: %w", err)
+//	}
+//	newToken, err := exchangeJwtForAccessToken(signedJWT, info)
+//	if err != nil {
+//		return "", fmt.Errorf("failed to exchange JWT for access token: %w", err)
+//	}
+//	if err := Cache.SetDefault(cacheKey, newToken); err {
+//		return newToken, nil
+//	}
+//	return newToken, nil
+//}
 
 func createSignedJWT(email, privateKeyPEM string) (string, error) {
 

@@ -2,9 +2,9 @@
 package vertex
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"errors"
-	"fmt"
+	//"fmt"
 	"io"
 	"net/http"
 	"strings"

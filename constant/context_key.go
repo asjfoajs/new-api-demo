@@ -12,4 +12,5 @@ const (
 	ContextKeyChannelBaseUrl           ContextKey = "base_url"
 	ContextKeyChannelModelMapping      ContextKey = "model_mapping"
 	ContextKeyChannelStatusCodeMapping ContextKey = "status_code_mapping"
+	ContextKeyChannelOrganization      ContextKey = "channel_organization"
 )

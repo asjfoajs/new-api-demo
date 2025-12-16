@@ -221,20 +221,21 @@ func GetAndValidateTextRequest(c *gin.Context, relayMode int) (*dto.GeneralOpenA
 		return nil, errors.New("model is required")
 	}
 
-	if textRequest.WebSearchOptions != nil {
-		if textRequest.WebSearchOptions.SearchContextSize != "" {
-			validSizes := map[string]bool{
-				"high":   true,
-				"medium": true,
-				"low":    true,
-			}
-			if !validSizes[textRequest.WebSearchOptions.SearchContextSize] {
-				return nil, errors.New("invalid search_context_size, must be one of: high, medium, low")
-			}
-		} else {
-			textRequest.WebSearchOptions.SearchContextSize = "medium"
-		}
-	}
+	//claude 字段暂不支持
+	//if textRequest.WebSearchOptions != nil {
+	//	if textRequest.WebSearchOptions.SearchContextSize != "" {
+	//		validSizes := map[string]bool{
+	//			"high":   true,
+	//			"medium": true,
+	//			"low":    true,
+	//		}
+	//		if !validSizes[textRequest.WebSearchOptions.SearchContextSize] {
+	//			return nil, errors.New("invalid search_context_size, must be one of: high, medium, low")
+	//		}
+	//	} else {
+	//		textRequest.WebSearchOptions.SearchContextSize = "medium"
+	//	}
+	//}
 	switch relayMode {
 	case relayconstant.RelayModeCompletions:
 		if textRequest.Prompt == "" {

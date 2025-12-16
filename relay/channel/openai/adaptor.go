@@ -189,25 +189,26 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, header *http.Header, info *
 	if info.ChannelType == constant.ChannelTypeOpenAI && "" != info.Organization {
 		header.Set("OpenAI-Organization", info.Organization)
 	}
-	if info.RelayMode == relayconstant.RelayModeRealtime {
-		swp := c.Request.Header.Get("Sec-WebSocket-Protocol")
-		if swp != "" {
-			items := []string{
-				"realtime",
-				"openai-insecure-api-key." + info.ApiKey,
-				"openai-beta.realtime-v1",
-			}
-			header.Set("Sec-WebSocket-Protocol", strings.Join(items, ","))
-			//req.Header.Set("Sec-WebSocket-Key", c.Request.Header.Get("Sec-WebSocket-Key"))
-			//req.Header.Set("Sec-Websocket-Extensions", c.Request.Header.Get("Sec-Websocket-Extensions"))
-			//req.Header.Set("Sec-Websocket-Version", c.Request.Header.Get("Sec-Websocket-Version"))
-		} else {
-			header.Set("openai-beta", "realtime=v1")
-			header.Set("Authorization", "Bearer "+info.ApiKey)
-		}
-	} else {
-		header.Set("Authorization", "Bearer "+info.ApiKey)
-	}
+	//realtime 是 websocket 长链接 暂不支持
+	//if info.RelayMode == relayconstant.RelayModeRealtime {
+	//	swp := c.Request.Header.Get("Sec-WebSocket-Protocol")
+	//	if swp != "" {
+	//		items := []string{
+	//			"realtime",
+	//			"openai-insecure-api-key." + info.ApiKey,
+	//			"openai-beta.realtime-v1",
+	//		}
+	//		header.Set("Sec-WebSocket-Protocol", strings.Join(items, ","))
+	//		//req.Header.Set("Sec-WebSocket-Key", c.Request.Header.Get("Sec-WebSocket-Key"))
+	//		//req.Header.Set("Sec-Websocket-Extensions", c.Request.Header.Get("Sec-Websocket-Extensions"))
+	//		//req.Header.Set("Sec-Websocket-Version", c.Request.Header.Get("Sec-Websocket-Version"))
+	//	} else {
+	//		header.Set("openai-beta", "realtime=v1")
+	//		header.Set("Authorization", "Bearer "+info.ApiKey)
+	//	}
+	//} else {
+	header.Set("Authorization", "Bearer "+info.ApiKey)
+	//}
 	if info.ChannelType == constant.ChannelTypeOpenRouter {
 		header.Set("HTTP-Referer", "https://www.newapi.ai")
 		header.Set("X-Title", "New API")
@@ -266,36 +267,37 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 			request.ReasoningEffort = ""
 		}
 
-		// https://docs.anthropic.com/en/api/openai-sdk#extended-thinking-support
-		// 没有做排除3.5Haiku等，要出问题再加吧，最佳兼容性（不是
-		if request.THINKING != nil && strings.HasPrefix(info.UpstreamModelName, "anthropic") {
-			var thinking dto.Thinking // Claude标准Thinking格式
-			if err := json.Unmarshal(request.THINKING, &thinking); err != nil {
-				return nil, fmt.Errorf("error Unmarshal thinking: %w", err)
-			}
-
-			// 只有当 thinking.Type 是 "enabled" 时才处理
-			if thinking.Type == "enabled" {
-				// 检查 BudgetTokens 是否为 nil
-				if thinking.BudgetTokens == nil {
-					return nil, fmt.Errorf("BudgetTokens is nil when thinking is enabled")
-				}
-
-				reasoning := openrouter.RequestReasoning{
-					MaxTokens: *thinking.BudgetTokens,
-				}
-
-				marshal, err := common.Marshal(reasoning)
-				if err != nil {
-					return nil, fmt.Errorf("error marshalling reasoning: %w", err)
-				}
-
-				request.Reasoning = marshal
-			}
-
-			// 清空 THINKING
-			request.THINKING = nil
-		}
+		////anthropic 先不兼容
+		//// https://docs.anthropic.com/en/api/openai-sdk#extended-thinking-support
+		//// 没有做排除3.5Haiku等，要出问题再加吧，最佳兼容性（不是
+		//if request.THINKING != nil && strings.HasPrefix(info.UpstreamModelName, "anthropic") {
+		//	var thinking dto.Thinking // Claude标准Thinking格式
+		//	if err := json.Unmarshal(request.THINKING, &thinking); err != nil {
+		//		return nil, fmt.Errorf("error Unmarshal thinking: %w", err)
+		//	}
+		//
+		//	// 只有当 thinking.Type 是 "enabled" 时才处理
+		//	if thinking.Type == "enabled" {
+		//		// 检查 BudgetTokens 是否为 nil
+		//		if thinking.BudgetTokens == nil {
+		//			return nil, fmt.Errorf("BudgetTokens is nil when thinking is enabled")
+		//		}
+		//
+		//		reasoning := openrouter.RequestReasoning{
+		//			MaxTokens: *thinking.BudgetTokens,
+		//		}
+		//
+		//		marshal, err := common.Marshal(reasoning)
+		//		if err != nil {
+		//			return nil, fmt.Errorf("error marshalling reasoning: %w", err)
+		//		}
+		//
+		//		request.Reasoning = marshal
+		//	}
+		//
+		//	// 清空 THINKING
+		//	request.THINKING = nil
+		//}
 
 	}
 	if strings.HasPrefix(info.UpstreamModelName, "o") || strings.HasPrefix(info.UpstreamModelName, "gpt-5") {
@@ -409,154 +411,154 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 //		return &requestBody, nil
 //	}
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	switch info.RelayMode {
-	case relayconstant.RelayModeImagesEdits:
-
-		var requestBody bytes.Buffer
-		writer := multipart.NewWriter(&requestBody)
-
-		writer.WriteField("model", request.Model)
-		// 使用已解析的 multipart 表单，避免重复解析
-		mf := c.Request.MultipartForm
-		if mf == nil {
-			if _, err := c.MultipartForm(); err != nil {
-				return nil, errors.New("failed to parse multipart form")
-			}
-			mf = c.Request.MultipartForm
-		}
-
-		// 写入所有非文件字段
-		if mf != nil {
-			for key, values := range mf.Value {
-				if key == "model" {
-					continue
-				}
-				for _, value := range values {
-					writer.WriteField(key, value)
-				}
-			}
-		}
-
-		if mf != nil && mf.File != nil {
-			// Check if "image" field exists in any form, including array notation
-			var imageFiles []*multipart.FileHeader
-			var exists bool
-
-			// First check for standard "image" field
-			if imageFiles, exists = mf.File["image"]; !exists || len(imageFiles) == 0 {
-				// If not found, check for "image[]" field
-				if imageFiles, exists = mf.File["image[]"]; !exists || len(imageFiles) == 0 {
-					// If still not found, iterate through all fields to find any that start with "image["
-					foundArrayImages := false
-					for fieldName, files := range mf.File {
-						if strings.HasPrefix(fieldName, "image[") && len(files) > 0 {
-							foundArrayImages = true
-							imageFiles = append(imageFiles, files...)
-						}
-					}
-
-					// If no image fields found at all
-					if !foundArrayImages && (len(imageFiles) == 0) {
-						return nil, errors.New("image is required")
-					}
-				}
-			}
-
-			// Process all image files
-			for i, fileHeader := range imageFiles {
-				file, err := fileHeader.Open()
-				if err != nil {
-					return nil, fmt.Errorf("failed to open image file %d: %w", i, err)
-				}
-
-				// If multiple images, use image[] as the field name
-				fieldName := "image"
-				if len(imageFiles) > 1 {
-					fieldName = "image[]"
-				}
-
-				// Determine MIME type based on file extension
-				mimeType := detectImageMimeType(fileHeader.Filename)
-
-				// Create a form file with the appropriate content type
-				h := make(textproto.MIMEHeader)
-				h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileHeader.Filename))
-				h.Set("Content-Type", mimeType)
-
-				part, err := writer.CreatePart(h)
-				if err != nil {
-					return nil, fmt.Errorf("create form part failed for image %d: %w", i, err)
-				}
-
-				if _, err := io.Copy(part, file); err != nil {
-					return nil, fmt.Errorf("copy file failed for image %d: %w", i, err)
-				}
-
-				// 复制完立即关闭，避免在循环内使用 defer 占用资源
-				_ = file.Close()
-			}
-
-			// Handle mask file if present
-			if maskFiles, exists := mf.File["mask"]; exists && len(maskFiles) > 0 {
-				maskFile, err := maskFiles[0].Open()
-				if err != nil {
-					return nil, errors.New("failed to open mask file")
-				}
-				// 复制完立即关闭，避免在循环内使用 defer 占用资源
-
-				// Determine MIME type for mask file
-				mimeType := detectImageMimeType(maskFiles[0].Filename)
-
-				// Create a form file with the appropriate content type
-				h := make(textproto.MIMEHeader)
-				h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="mask"; filename="%s"`, maskFiles[0].Filename))
-				h.Set("Content-Type", mimeType)
-
-				maskPart, err := writer.CreatePart(h)
-				if err != nil {
-					return nil, errors.New("create form file failed for mask")
-				}
-
-				if _, err := io.Copy(maskPart, maskFile); err != nil {
-					return nil, errors.New("copy mask file failed")
-				}
-				_ = maskFile.Close()
-			}
-		} else {
-			return nil, errors.New("no multipart form data found")
-		}
-
-		// 关闭 multipart 编写器以设置分界线
-		writer.Close()
-		c.Request.Header.Set("Content-Type", writer.FormDataContentType())
-		return &requestBody, nil
-
-	default:
-		return request, nil
-	}
-}
-
-// detectImageMimeType determines the MIME type based on the file extension
-func detectImageMimeType(filename string) string {
-	ext := strings.ToLower(filepath.Ext(filename))
-	switch ext {
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".png":
-		return "image/png"
-	case ".webp":
-		return "image/webp"
-	default:
-		// Try to detect from extension if possible
-		if strings.HasPrefix(ext, ".jp") {
-			return "image/jpeg"
-		}
-		// Default to png as a fallback
-		return "image/png"
-	}
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	switch info.RelayMode {
+//	case relayconstant.RelayModeImagesEdits:
+//
+//		var requestBody bytes.Buffer
+//		writer := multipart.NewWriter(&requestBody)
+//
+//		writer.WriteField("model", request.Model)
+//		// 使用已解析的 multipart 表单，避免重复解析
+//		mf := c.Request.MultipartForm
+//		if mf == nil {
+//			if _, err := c.MultipartForm(); err != nil {
+//				return nil, errors.New("failed to parse multipart form")
+//			}
+//			mf = c.Request.MultipartForm
+//		}
+//
+//		// 写入所有非文件字段
+//		if mf != nil {
+//			for key, values := range mf.Value {
+//				if key == "model" {
+//					continue
+//				}
+//				for _, value := range values {
+//					writer.WriteField(key, value)
+//				}
+//			}
+//		}
+//
+//		if mf != nil && mf.File != nil {
+//			// Check if "image" field exists in any form, including array notation
+//			var imageFiles []*multipart.FileHeader
+//			var exists bool
+//
+//			// First check for standard "image" field
+//			if imageFiles, exists = mf.File["image"]; !exists || len(imageFiles) == 0 {
+//				// If not found, check for "image[]" field
+//				if imageFiles, exists = mf.File["image[]"]; !exists || len(imageFiles) == 0 {
+//					// If still not found, iterate through all fields to find any that start with "image["
+//					foundArrayImages := false
+//					for fieldName, files := range mf.File {
+//						if strings.HasPrefix(fieldName, "image[") && len(files) > 0 {
+//							foundArrayImages = true
+//							imageFiles = append(imageFiles, files...)
+//						}
+//					}
+//
+//					// If no image fields found at all
+//					if !foundArrayImages && (len(imageFiles) == 0) {
+//						return nil, errors.New("image is required")
+//					}
+//				}
+//			}
+//
+//			// Process all image files
+//			for i, fileHeader := range imageFiles {
+//				file, err := fileHeader.Open()
+//				if err != nil {
+//					return nil, fmt.Errorf("failed to open image file %d: %w", i, err)
+//				}
+//
+//				// If multiple images, use image[] as the field name
+//				fieldName := "image"
+//				if len(imageFiles) > 1 {
+//					fieldName = "image[]"
+//				}
+//
+//				// Determine MIME type based on file extension
+//				mimeType := detectImageMimeType(fileHeader.Filename)
+//
+//				// Create a form file with the appropriate content type
+//				h := make(textproto.MIMEHeader)
+//				h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileHeader.Filename))
+//				h.Set("Content-Type", mimeType)
+//
+//				part, err := writer.CreatePart(h)
+//				if err != nil {
+//					return nil, fmt.Errorf("create form part failed for image %d: %w", i, err)
+//				}
+//
+//				if _, err := io.Copy(part, file); err != nil {
+//					return nil, fmt.Errorf("copy file failed for image %d: %w", i, err)
+//				}
+//
+//				// 复制完立即关闭，避免在循环内使用 defer 占用资源
+//				_ = file.Close()
+//			}
+//
+//			// Handle mask file if present
+//			if maskFiles, exists := mf.File["mask"]; exists && len(maskFiles) > 0 {
+//				maskFile, err := maskFiles[0].Open()
+//				if err != nil {
+//					return nil, errors.New("failed to open mask file")
+//				}
+//				// 复制完立即关闭，避免在循环内使用 defer 占用资源
+//
+//				// Determine MIME type for mask file
+//				mimeType := detectImageMimeType(maskFiles[0].Filename)
+//
+//				// Create a form file with the appropriate content type
+//				h := make(textproto.MIMEHeader)
+//				h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="mask"; filename="%s"`, maskFiles[0].Filename))
+//				h.Set("Content-Type", mimeType)
+//
+//				maskPart, err := writer.CreatePart(h)
+//				if err != nil {
+//					return nil, errors.New("create form file failed for mask")
+//				}
+//
+//				if _, err := io.Copy(maskPart, maskFile); err != nil {
+//					return nil, errors.New("copy mask file failed")
+//				}
+//				_ = maskFile.Close()
+//			}
+//		} else {
+//			return nil, errors.New("no multipart form data found")
+//		}
+//
+//		// 关闭 multipart 编写器以设置分界线
+//		writer.Close()
+//		c.Request.Header.Set("Content-Type", writer.FormDataContentType())
+//		return &requestBody, nil
+//
+//	default:
+//		return request, nil
+//	}
+//}
+//
+//// detectImageMimeType determines the MIME type based on the file extension
+//func detectImageMimeType(filename string) string {
+//	ext := strings.ToLower(filepath.Ext(filename))
+//	switch ext {
+//	case ".jpg", ".jpeg":
+//		return "image/jpeg"
+//	case ".png":
+//		return "image/png"
+//	case ".webp":
+//		return "image/webp"
+//	default:
+//		// Try to detect from extension if possible
+//		if strings.HasPrefix(ext, ".jp") {
+//			return "image/jpeg"
+//		}
+//		// Default to png as a fallback
+//		return "image/png"
+//	}
+//}
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	//  转换模型推理力度后缀
@@ -588,24 +590,24 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	switch info.RelayMode {
-	case relayconstant.RelayModeRealtime:
-		err, usage = OpenaiRealtimeHandler(c, info)
-	case relayconstant.RelayModeAudioSpeech:
-		usage = OpenaiTTSHandler(c, resp, info)
-	case relayconstant.RelayModeAudioTranslation:
-		fallthrough
-	case relayconstant.RelayModeAudioTranscription:
-		err, usage = OpenaiSTTHandler(c, resp, info, a.ResponseFormat)
-	case relayconstant.RelayModeImagesGenerations, relayconstant.RelayModeImagesEdits:
-		usage, err = OpenaiHandlerWithUsage(c, info, resp)
-	case relayconstant.RelayModeRerank:
-		usage, err = common_handler.RerankHandler(c, info, resp)
-	case relayconstant.RelayModeResponses:
-		if info.IsStream {
-			usage, err = OaiResponsesStreamHandler(c, info, resp)
-		} else {
-			usage, err = OaiResponsesHandler(c, info, resp)
-		}
+	//case relayconstant.RelayModeRealtime:
+	//	err, usage = OpenaiRealtimeHandler(c, info)
+	//case relayconstant.RelayModeAudioSpeech:
+	//	usage = OpenaiTTSHandler(c, resp, info)
+	//case relayconstant.RelayModeAudioTranslation:
+	//	fallthrough
+	//case relayconstant.RelayModeAudioTranscription:
+	//	err, usage = OpenaiSTTHandler(c, resp, info, a.ResponseFormat)
+	//case relayconstant.RelayModeImagesGenerations, relayconstant.RelayModeImagesEdits:
+	//	usage, err = OpenaiHandlerWithUsage(c, info, resp)
+	//case relayconstant.RelayModeRerank:
+	//	usage, err = common_handler.RerankHandler(c, info, resp)
+	//case relayconstant.RelayModeResponses:
+	//	if info.IsStream {
+	//		usage, err = OaiResponsesStreamHandler(c, info, resp)
+	//	} else {
+	//		usage, err = OaiResponsesHandler(c, info, resp)
+	//	}
 	default:
 		if info.IsStream {
 			usage, err = OaiStreamHandler(c, info, resp)

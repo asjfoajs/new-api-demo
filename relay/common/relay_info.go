@@ -66,8 +66,8 @@ type ChannelMeta struct {
 	ChannelBaseUrl string
 	ApiType        int
 	//ApiVersion        string
-	ApiKey string
-	//Organization      string
+	ApiKey       string
+	Organization string
 	//ChannelCreateTime int64
 	//ParamOverride     map[string]interface{}
 	//HeadersOverride   map[string]interface{}
@@ -141,7 +141,8 @@ func (info *RelayInfo) InitChannelMeta(c *gin.Context) {
 		ApiType:        apiType,
 		//ApiVersion:           c.GetString("api_version"),
 		ApiKey: common.GetContextKeyString(c, constant.ContextKeyChannelKey),
-		//Organization:         c.GetString("channel_organization"),
+		//Organization: c.GetString("channel_organization"),
+		Organization: common.GetContextKeyString(c, constant.ContextKeyChannelOrganization), //组织计费用的
 		//ChannelCreateTime:    c.GetInt64("channel_create_time"),
 		//ParamOverride:        paramOverride,
 		//HeadersOverride:      headerOverride,

@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"new-api-demo/dto"
-	"new-api-demo/relay/channel"
 	"new-api-demo/relay/channel/claude"
 	relaycommon "new-api-demo/relay/common"
 	"new-api-demo/types"
@@ -146,28 +145,30 @@ func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommo
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	if a.ClientMode == ClientModeApiKey {
-		return channel.DoApiRequest(a, c, info, requestBody)
-	} else {
-		return doAwsClientRequest(c, info, a, requestBody)
-	}
+	//if a.ClientMode == ClientModeApiKey {
+	//	return channel.DoApiRequest(a, c, info, requestBody)
+	//} else {
+	//	return doAwsClientRequest(c, info, a, requestBody)
+	//}
+
+	return nil, nil
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if a.ClientMode == ClientModeApiKey {
-		claudeAdaptor := claude.Adaptor{}
-		usage, err = claudeAdaptor.DoResponse(c, resp, info)
-	} else {
-		if a.IsNova {
-			err, usage = handleNovaRequest(c, info, a)
-		} else {
-			if info.IsStream {
-				err, usage = awsStreamHandler(c, info, a)
-			} else {
-				err, usage = awsHandler(c, info, a)
-			}
-		}
-	}
+	//if a.ClientMode == ClientModeApiKey {
+	//	claudeAdaptor := claude.Adaptor{}
+	//	usage, err = claudeAdaptor.DoResponse(c, resp, info)
+	//} else {
+	//	if a.IsNova {
+	//		err, usage = handleNovaRequest(c, info, a)
+	//	} else {
+	//		if info.IsStream {
+	//			err, usage = awsStreamHandler(c, info, a)
+	//		} else {
+	//			err, usage = awsHandler(c, info, a)
+	//		}
+	//	}
+	//}
 	return
 }
 

@@ -154,11 +154,11 @@ func OaiStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Re
 			usage = streamResp.Usage
 			containStreamUsage = true
 
-			if common.DebugEnabled {
-				logger.LogDebug(c, fmt.Sprintf("Audio model usage extracted from second last SSE: PromptTokens=%d, CompletionTokens=%d, TotalTokens=%d, InputTokens=%d, OutputTokens=%d",
-					usage.PromptTokens, usage.CompletionTokens, usage.TotalTokens,
-					usage.InputTokens, usage.OutputTokens))
-			}
+			//if common.DebugEnabled {
+			//	logger.LogDebug(c, fmt.Sprintf("Audio model usage extracted from second last SSE: PromptTokens=%d, CompletionTokens=%d, TotalTokens=%d, InputTokens=%d, OutputTokens=%d",
+			//		usage.PromptTokens, usage.CompletionTokens, usage.TotalTokens,
+			//		usage.InputTokens, usage.OutputTokens))
+			//}
 		}
 	}
 
@@ -200,9 +200,9 @@ func OpenaiHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respo
 	if err != nil {
 		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
 	}
-	if common.DebugEnabled {
-		println("upstream response body:", string(responseBody))
-	}
+	//if common.DebugEnabled {
+	//	println("upstream response body:", string(responseBody))
+	//}
 	// Unmarshal to simpleResponse
 	if info.ChannelType == constant.ChannelTypeOpenRouter && info.ChannelOtherSettings.IsOpenRouterEnterprise() {
 		// 尝试解析为 openrouter enterprise
@@ -271,20 +271,20 @@ func OpenaiHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respo
 		} else {
 			break
 		}
-	case types.RelayFormatClaude:
-		claudeResp := service.ResponseOpenAI2Claude(&simpleResponse, info)
-		claudeRespStr, err := common.Marshal(claudeResp)
-		if err != nil {
-			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-		}
-		responseBody = claudeRespStr
-	case types.RelayFormatGemini:
-		geminiResp := service.ResponseOpenAI2Gemini(&simpleResponse, info)
-		geminiRespStr, err := common.Marshal(geminiResp)
-		if err != nil {
-			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-		}
-		responseBody = geminiRespStr
+		//case types.RelayFormatClaude:
+		//	claudeResp := service.ResponseOpenAI2Claude(&simpleResponse, info)
+		//	claudeRespStr, err := common.Marshal(claudeResp)
+		//	if err != nil {
+		//		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		//	}
+		//	responseBody = claudeRespStr
+		//case types.RelayFormatGemini:
+		//	geminiResp := service.ResponseOpenAI2Gemini(&simpleResponse, info)
+		//	geminiRespStr, err := common.Marshal(geminiResp)
+		//	if err != nil {
+		//		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		//	}
+		//	responseBody = geminiRespStr
 	}
 
 	service.IOCopyBytesGracefully(c, resp, responseBody)
@@ -594,60 +594,60 @@ func OpenaiSTTHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rel
 //
 //	return nil, sumUsage
 //}
-
-func preConsumeUsage(ctx *gin.Context, info *relaycommon.RelayInfo, usage *dto.RealtimeUsage, totalUsage *dto.RealtimeUsage) error {
-	if usage == nil || totalUsage == nil {
-		return fmt.Errorf("invalid usage pointer")
-	}
-
-	totalUsage.TotalTokens += usage.TotalTokens
-	totalUsage.InputTokens += usage.InputTokens
-	totalUsage.OutputTokens += usage.OutputTokens
-	totalUsage.InputTokenDetails.CachedTokens += usage.InputTokenDetails.CachedTokens
-	totalUsage.InputTokenDetails.TextTokens += usage.InputTokenDetails.TextTokens
-	totalUsage.InputTokenDetails.AudioTokens += usage.InputTokenDetails.AudioTokens
-	totalUsage.OutputTokenDetails.TextTokens += usage.OutputTokenDetails.TextTokens
-	totalUsage.OutputTokenDetails.AudioTokens += usage.OutputTokenDetails.AudioTokens
-	// clear usage
-	//err := service.PreWssConsumeQuota(ctx, info, usage)
-	//return err
-	return nil
-}
-
-func OpenaiHandlerWithUsage(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	defer service.CloseResponseBodyGracefully(resp)
-
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
-	}
-
-	var usageResp dto.SimpleResponse
-	err = common.Unmarshal(responseBody, &usageResp)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-
-	// 写入新的 response body
-	service.IOCopyBytesGracefully(c, resp, responseBody)
-
-	// Once we've written to the client, we should not return errors anymore
-	// because the upstream has already consumed resources and returned content
-	// We should still perform billing even if parsing fails
-	// format
-	if usageResp.InputTokens > 0 {
-		usageResp.PromptTokens += usageResp.InputTokens
-	}
-	if usageResp.OutputTokens > 0 {
-		usageResp.CompletionTokens += usageResp.OutputTokens
-	}
-	if usageResp.InputTokensDetails != nil {
-		usageResp.PromptTokensDetails.ImageTokens += usageResp.InputTokensDetails.ImageTokens
-		usageResp.PromptTokensDetails.TextTokens += usageResp.InputTokensDetails.TextTokens
-	}
-	applyUsagePostProcessing(info, &usageResp.Usage, responseBody)
-	return &usageResp.Usage, nil
-}
+//
+//func preConsumeUsage(ctx *gin.Context, info *relaycommon.RelayInfo, usage *dto.RealtimeUsage, totalUsage *dto.RealtimeUsage) error {
+//	if usage == nil || totalUsage == nil {
+//		return fmt.Errorf("invalid usage pointer")
+//	}
+//
+//	totalUsage.TotalTokens += usage.TotalTokens
+//	totalUsage.InputTokens += usage.InputTokens
+//	totalUsage.OutputTokens += usage.OutputTokens
+//	totalUsage.InputTokenDetails.CachedTokens += usage.InputTokenDetails.CachedTokens
+//	totalUsage.InputTokenDetails.TextTokens += usage.InputTokenDetails.TextTokens
+//	totalUsage.InputTokenDetails.AudioTokens += usage.InputTokenDetails.AudioTokens
+//	totalUsage.OutputTokenDetails.TextTokens += usage.OutputTokenDetails.TextTokens
+//	totalUsage.OutputTokenDetails.AudioTokens += usage.OutputTokenDetails.AudioTokens
+//	// clear usage
+//	//err := service.PreWssConsumeQuota(ctx, info, usage)
+//	//return err
+//	return nil
+//}
+//
+//func OpenaiHandlerWithUsage(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
+//	defer service.CloseResponseBodyGracefully(resp)
+//
+//	responseBody, err := io.ReadAll(resp.Body)
+//	if err != nil {
+//		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+//	}
+//
+//	var usageResp dto.SimpleResponse
+//	err = common.Unmarshal(responseBody, &usageResp)
+//	if err != nil {
+//		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+//	}
+//
+//	// 写入新的 response body
+//	service.IOCopyBytesGracefully(c, resp, responseBody)
+//
+//	// Once we've written to the client, we should not return errors anymore
+//	// because the upstream has already consumed resources and returned content
+//	// We should still perform billing even if parsing fails
+//	// format
+//	if usageResp.InputTokens > 0 {
+//		usageResp.PromptTokens += usageResp.InputTokens
+//	}
+//	if usageResp.OutputTokens > 0 {
+//		usageResp.CompletionTokens += usageResp.OutputTokens
+//	}
+//	if usageResp.InputTokensDetails != nil {
+//		usageResp.PromptTokensDetails.ImageTokens += usageResp.InputTokensDetails.ImageTokens
+//		usageResp.PromptTokensDetails.TextTokens += usageResp.InputTokensDetails.TextTokens
+//	}
+//	applyUsagePostProcessing(info, &usageResp.Usage, responseBody)
+//	return &usageResp.Usage, nil
+//}
 
 func applyUsagePostProcessing(info *relaycommon.RelayInfo, usage *dto.Usage, responseBody []byte) {
 	if info == nil || usage == nil {

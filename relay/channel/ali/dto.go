@@ -1,7 +1,5 @@
 package ali
 
-import "new-api-demo/dto"
-
 type AliMessage struct {
 	Content any    `json:"content"`
 	Role    string `json:"role"`
@@ -141,11 +139,12 @@ type AliRerankRequest struct {
 	Parameters AliRerankParameters `json:"parameters,omitempty"`
 }
 
-type AliRerankResponse struct {
-	Output struct {
-		Results []dto.RerankResponseResult `json:"results"`
-	} `json:"output"`
-	Usage     AliUsage `json:"usage"`
-	RequestId string   `json:"request_id"`
-	AliError
-}
+//
+//type AliRerankResponse struct {
+//	Output struct {
+//		Results []dto.RerankResponseResult `json:"results"`
+//	} `json:"output"`
+//	Usage     AliUsage `json:"usage"`
+//	RequestId string   `json:"request_id"`
+//	AliError
+//}
