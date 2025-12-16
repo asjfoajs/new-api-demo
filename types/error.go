@@ -63,10 +63,10 @@ const (
 	//	ErrorCodeBadRequestBody ErrorCode = "bad_request_body"
 	//
 	//	// response error
-	//	ErrorCodeReadResponseBodyFailed ErrorCode = "read_response_body_failed"
-	ErrorCodeBadResponseStatusCode ErrorCode = "bad_response_status_code"
-	//	ErrorCodeBadResponse            ErrorCode = "bad_response"
-	//	ErrorCodeBadResponseBody        ErrorCode = "bad_response_body"
+	ErrorCodeReadResponseBodyFailed ErrorCode = "read_response_body_failed"
+	ErrorCodeBadResponseStatusCode  ErrorCode = "bad_response_status_code"
+	ErrorCodeBadResponse            ErrorCode = "bad_response"
+	ErrorCodeBadResponseBody        ErrorCode = "bad_response_body"
 	//	ErrorCodeEmptyResponse          ErrorCode = "empty_response"
 	//	ErrorCodeAwsInvokeError         ErrorCode = "aws_invoke_error"
 	//	ErrorCodeModelNotFound          ErrorCode = "model_not_found"
@@ -328,21 +328,20 @@ func ErrOptionWithSkipRetry() NewAPIErrorOptions {
 	}
 }
 
-//
-//func ErrOptionWithNoRecordErrorLog() NewAPIErrorOptions {
-//	return func(e *NewAPIError) {
-//		e.recordErrorLog = common.GetPointer(false)
-//	}
-//}
-//
-//func ErrOptionWithHideErrMsg(replaceStr string) NewAPIErrorOptions {
-//	return func(e *NewAPIError) {
-//		if common.DebugEnabled {
-//			fmt.Printf("ErrOptionWithHideErrMsg: %s, origin error: %s", replaceStr, e.Err)
+//	func ErrOptionWithNoRecordErrorLog() NewAPIErrorOptions {
+//		return func(e *NewAPIError) {
+//			e.recordErrorLog = common.GetPointer(false)
 //		}
-//		e.Err = errors.New(replaceStr)
 //	}
-//}
+func ErrOptionWithHideErrMsg(replaceStr string) NewAPIErrorOptions {
+	return func(e *NewAPIError) {
+		//if common.DebugEnabled {
+		//	fmt.Printf("ErrOptionWithHideErrMsg: %s, origin error: %s", replaceStr, e.Err)
+		//}
+		e.Err = errors.New(replaceStr)
+	}
+}
+
 //
 //func IsRecordErrorLog(e *NewAPIError) bool {
 //	if e == nil {

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"new-api-demo/route"
+	"new-api-demo/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -156,6 +157,9 @@ func handleChatCompletions(c *gin.Context) {
 }
 
 func main() {
+
+	service.InitHttpClient()
+	service.InitTokenEncoders()
 	// 创建 Gin 路由
 	router := gin.Default()
 	// 设置路由组

@@ -55,7 +55,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		return
 	}
 
-	for i := 0; i <= common.RetryTimes; i++ {
+	for i := 0; i <= constant.RetryTimes; i++ {
 		channel, err := getChannel(c, originalModel, i)
 		if err != nil {
 			logger.LogError(c, err.Error())
@@ -78,7 +78,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 
 		logger.LogError(c, fmt.Sprintf("channel error (channel #%d, status code: %d): %s", channel.Id, newAPIError.StatusCode, newAPIError.Error()))
 
-		if !shouldRetry(c, newAPIError, common.RetryTimes-i) {
+		if !shouldRetry(c, newAPIError, constant.RetryTimes-i) {
 			break
 		}
 	}

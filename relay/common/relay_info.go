@@ -9,7 +9,6 @@ import (
 	"new-api-demo/dto"
 	relayconstant "new-api-demo/relay/constant"
 	"new-api-demo/types"
-	"strings"
 	"time"
 	//"github.com/QuantumNous/new-api/common"
 	//"github.com/QuantumNous/new-api/constant"
@@ -21,7 +20,6 @@ import (
 	//"github.com/gorilla/websocket"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/websocket"
 )
 
 type ThinkingContentInfo struct {
@@ -120,8 +118,8 @@ type RelayInfo struct {
 	//PriceData types.PriceData
 
 	Request dto.Request
-	//
-	//ThinkingContentInfo
+
+	ThinkingContentInfo
 	//*ClaudeConvertInfo
 	//*RerankerInfo
 	//*ResponsesUsageInfo
@@ -159,10 +157,10 @@ func (info *RelayInfo) InitChannelMeta(c *gin.Context) {
 	//	channelMeta.ApiVersion = c.GetString("region")
 	//}
 
-	channelSetting, ok := common.GetContextKeyType[dto.ChannelSettings](c, constant.ContextKeyChannelSetting)
-	if ok {
-		channelMeta.ChannelSetting = channelSetting
-	}
+	//channelSetting, ok := common.GetContextKeyType[dto.ChannelSettings](c, constant.ContextKeyChannelSetting)
+	//if ok {
+	//	channelMeta.ChannelSetting = channelSetting
+	//}
 
 	//channelOtherSettings, ok := common.GetContextKeyType[dto.ChannelOtherSettings](c, constant.ContextKeyChannelOtherSetting)
 	//if ok {
@@ -182,80 +180,80 @@ func (info *RelayInfo) InitChannelMeta(c *gin.Context) {
 	}
 }
 
-func (info *RelayInfo) ToString() string {
-	if info == nil {
-		return "RelayInfo<nil>"
-	}
-
-	// Basic info
-	b := &strings.Builder{}
-	fmt.Fprintf(b, "RelayInfo{ ")
-	fmt.Fprintf(b, "RelayFormat: %s, ", info.RelayFormat)
-	fmt.Fprintf(b, "RelayMode: %d, ", info.RelayMode)
-	fmt.Fprintf(b, "IsStream: %t, ", info.IsStream)
-	fmt.Fprintf(b, "IsPlayground: %t, ", info.IsPlayground)
-	fmt.Fprintf(b, "RequestURLPath: %q, ", info.RequestURLPath)
-	fmt.Fprintf(b, "OriginModelName: %q, ", info.OriginModelName)
-	fmt.Fprintf(b, "PromptTokens: %d, ", info.PromptTokens)
-	fmt.Fprintf(b, "ShouldIncludeUsage: %t, ", info.ShouldIncludeUsage)
-	fmt.Fprintf(b, "DisablePing: %t, ", info.DisablePing)
-	fmt.Fprintf(b, "SendResponseCount: %d, ", info.SendResponseCount)
-	fmt.Fprintf(b, "FinalPreConsumedQuota: %d, ", info.FinalPreConsumedQuota)
-
-	// User & token info (mask secrets)
-	fmt.Fprintf(b, "User{ Id: %d, Email: %q, Group: %q, UsingGroup: %q, Quota: %d }, ",
-		info.UserId, common.MaskEmail(info.UserEmail), info.UserGroup, info.UsingGroup, info.UserQuota)
-	fmt.Fprintf(b, "Token{ Id: %d, Unlimited: %t, Key: ***masked*** }, ", info.TokenId, info.TokenUnlimited)
-
-	// Time info
-	latencyMs := info.FirstResponseTime.Sub(info.StartTime).Milliseconds()
-	fmt.Fprintf(b, "Timing{ Start: %s, FirstResponse: %s, LatencyMs: %d }, ",
-		info.StartTime.Format(time.RFC3339Nano), info.FirstResponseTime.Format(time.RFC3339Nano), latencyMs)
-
-	// Audio / realtime
-	if info.InputAudioFormat != "" || info.OutputAudioFormat != "" || len(info.RealtimeTools) > 0 || info.AudioUsage {
-		fmt.Fprintf(b, "Realtime{ AudioUsage: %t, InFmt: %q, OutFmt: %q, Tools: %d }, ",
-			info.AudioUsage, info.InputAudioFormat, info.OutputAudioFormat, len(info.RealtimeTools))
-	}
-
-	// Reasoning
-	if info.ReasoningEffort != "" {
-		fmt.Fprintf(b, "ReasoningEffort: %q, ", info.ReasoningEffort)
-	}
-
-	// Price data (non-sensitive)
-	if info.PriceData.UsePrice {
-		fmt.Fprintf(b, "PriceData{ %s }, ", info.PriceData.ToSetting())
-	}
-
-	// Channel metadata (mask ApiKey)
-	if info.ChannelMeta != nil {
-		cm := info.ChannelMeta
-		fmt.Fprintf(b, "ChannelMeta{ Type: %d, Id: %d, IsMultiKey: %t, MultiKeyIndex: %d, BaseURL: %q, ApiType: %d, ApiVersion: %q, Organization: %q, CreateTime: %d, UpstreamModelName: %q, IsModelMapped: %t, SupportStreamOptions: %t, ApiKey: ***masked*** }, ",
-			cm.ChannelType, cm.ChannelId, cm.ChannelIsMultiKey, cm.ChannelMultiKeyIndex, cm.ChannelBaseUrl, cm.ApiType, cm.ApiVersion, cm.Organization, cm.ChannelCreateTime, cm.UpstreamModelName, cm.IsModelMapped, cm.SupportStreamOptions)
-	}
-
-	// Responses usage info (non-sensitive)
-	if info.ResponsesUsageInfo != nil && len(info.ResponsesUsageInfo.BuiltInTools) > 0 {
-		fmt.Fprintf(b, "ResponsesTools{ ")
-		first := true
-		for name, tool := range info.ResponsesUsageInfo.BuiltInTools {
-			if !first {
-				fmt.Fprintf(b, ", ")
-			}
-			first = false
-			if tool != nil {
-				fmt.Fprintf(b, "%s: calls=%d", name, tool.CallCount)
-			} else {
-				fmt.Fprintf(b, "%s: calls=0", name)
-			}
-		}
-		fmt.Fprintf(b, " }, ")
-	}
-
-	fmt.Fprintf(b, "}")
-	return b.String()
-}
+//func (info *RelayInfo) ToString() string {
+//	if info == nil {
+//		return "RelayInfo<nil>"
+//	}
+//
+//	// Basic info
+//	b := &strings.Builder{}
+//	fmt.Fprintf(b, "RelayInfo{ ")
+//	fmt.Fprintf(b, "RelayFormat: %s, ", info.RelayFormat)
+//	fmt.Fprintf(b, "RelayMode: %d, ", info.RelayMode)
+//	fmt.Fprintf(b, "IsStream: %t, ", info.IsStream)
+//	fmt.Fprintf(b, "IsPlayground: %t, ", info.IsPlayground)
+//	fmt.Fprintf(b, "RequestURLPath: %q, ", info.RequestURLPath)
+//	fmt.Fprintf(b, "OriginModelName: %q, ", info.OriginModelName)
+//	fmt.Fprintf(b, "PromptTokens: %d, ", info.PromptTokens)
+//	fmt.Fprintf(b, "ShouldIncludeUsage: %t, ", info.ShouldIncludeUsage)
+//	fmt.Fprintf(b, "DisablePing: %t, ", info.DisablePing)
+//	fmt.Fprintf(b, "SendResponseCount: %d, ", info.SendResponseCount)
+//	fmt.Fprintf(b, "FinalPreConsumedQuota: %d, ", info.FinalPreConsumedQuota)
+//
+//	// User & token info (mask secrets)
+//	fmt.Fprintf(b, "User{ Id: %d, Email: %q, Group: %q, UsingGroup: %q, Quota: %d }, ",
+//		info.UserId, common.MaskEmail(info.UserEmail), info.UserGroup, info.UsingGroup, info.UserQuota)
+//	fmt.Fprintf(b, "Token{ Id: %d, Unlimited: %t, Key: ***masked*** }, ", info.TokenId, info.TokenUnlimited)
+//
+//	// Time info
+//	latencyMs := info.FirstResponseTime.Sub(info.StartTime).Milliseconds()
+//	fmt.Fprintf(b, "Timing{ Start: %s, FirstResponse: %s, LatencyMs: %d }, ",
+//		info.StartTime.Format(time.RFC3339Nano), info.FirstResponseTime.Format(time.RFC3339Nano), latencyMs)
+//
+//	// Audio / realtime
+//	if info.InputAudioFormat != "" || info.OutputAudioFormat != "" || len(info.RealtimeTools) > 0 || info.AudioUsage {
+//		fmt.Fprintf(b, "Realtime{ AudioUsage: %t, InFmt: %q, OutFmt: %q, Tools: %d }, ",
+//			info.AudioUsage, info.InputAudioFormat, info.OutputAudioFormat, len(info.RealtimeTools))
+//	}
+//
+//	// Reasoning
+//	if info.ReasoningEffort != "" {
+//		fmt.Fprintf(b, "ReasoningEffort: %q, ", info.ReasoningEffort)
+//	}
+//
+//	// Price data (non-sensitive)
+//	if info.PriceData.UsePrice {
+//		fmt.Fprintf(b, "PriceData{ %s }, ", info.PriceData.ToSetting())
+//	}
+//
+//	// Channel metadata (mask ApiKey)
+//	if info.ChannelMeta != nil {
+//		cm := info.ChannelMeta
+//		fmt.Fprintf(b, "ChannelMeta{ Type: %d, Id: %d, IsMultiKey: %t, MultiKeyIndex: %d, BaseURL: %q, ApiType: %d, ApiVersion: %q, Organization: %q, CreateTime: %d, UpstreamModelName: %q, IsModelMapped: %t, SupportStreamOptions: %t, ApiKey: ***masked*** }, ",
+//			cm.ChannelType, cm.ChannelId, cm.ChannelIsMultiKey, cm.ChannelMultiKeyIndex, cm.ChannelBaseUrl, cm.ApiType, cm.ApiVersion, cm.Organization, cm.ChannelCreateTime, cm.UpstreamModelName, cm.IsModelMapped, cm.SupportStreamOptions)
+//	}
+//
+//	// Responses usage info (non-sensitive)
+//	if info.ResponsesUsageInfo != nil && len(info.ResponsesUsageInfo.BuiltInTools) > 0 {
+//		fmt.Fprintf(b, "ResponsesTools{ ")
+//		first := true
+//		for name, tool := range info.ResponsesUsageInfo.BuiltInTools {
+//			if !first {
+//				fmt.Fprintf(b, ", ")
+//			}
+//			first = false
+//			if tool != nil {
+//				fmt.Fprintf(b, "%s: calls=%d", name, tool.CallCount)
+//			} else {
+//				fmt.Fprintf(b, "%s: calls=0", name)
+//			}
+//		}
+//		fmt.Fprintf(b, " }, ")
+//	}
+//
+//	fmt.Fprintf(b, "}")
+//	return b.String()
+//}
 
 // 定义支持流式选项的通道类型
 var streamSupportedChannels = map[int]bool{
@@ -425,42 +423,42 @@ func FailTaskInfo(reason string) *TaskInfo {
 	}
 }
 
-// RemoveDisabledFields 从请求 JSON 数据中移除渠道设置中禁用的字段
-// service_tier: 服务层级字段，可能导致额外计费（OpenAI、Claude、Responses API 支持）
-// store: 数据存储授权字段，涉及用户隐私（仅 OpenAI、Responses API 支持，默认允许透传，禁用后可能导致 Codex 无法使用）
-// safety_identifier: 安全标识符，用于向 OpenAI 报告违规用户（仅 OpenAI 支持，涉及用户隐私）
-func RemoveDisabledFields(jsonData []byte, channelOtherSettings dto.ChannelOtherSettings) ([]byte, error) {
-	var data map[string]interface{}
-	if err := common.Unmarshal(jsonData, &data); err != nil {
-		common.SysError("RemoveDisabledFields Unmarshal error :" + err.Error())
-		return jsonData, nil
-	}
-
-	// 默认移除 service_tier，除非明确允许（避免额外计费风险）
-	if !channelOtherSettings.AllowServiceTier {
-		if _, exists := data["service_tier"]; exists {
-			delete(data, "service_tier")
-		}
-	}
-
-	// 默认允许 store 透传，除非明确禁用（禁用可能影响 Codex 使用）
-	if channelOtherSettings.DisableStore {
-		if _, exists := data["store"]; exists {
-			delete(data, "store")
-		}
-	}
-
-	// 默认移除 safety_identifier，除非明确允许（保护用户隐私，避免向 OpenAI 报告用户信息）
-	if !channelOtherSettings.AllowSafetyIdentifier {
-		if _, exists := data["safety_identifier"]; exists {
-			delete(data, "safety_identifier")
-		}
-	}
-
-	jsonDataAfter, err := common.Marshal(data)
-	if err != nil {
-		common.SysError("RemoveDisabledFields Marshal error :" + err.Error())
-		return jsonData, nil
-	}
-	return jsonDataAfter, nil
-}
+//// RemoveDisabledFields 从请求 JSON 数据中移除渠道设置中禁用的字段
+//// service_tier: 服务层级字段，可能导致额外计费（OpenAI、Claude、Responses API 支持）
+//// store: 数据存储授权字段，涉及用户隐私（仅 OpenAI、Responses API 支持，默认允许透传，禁用后可能导致 Codex 无法使用）
+//// safety_identifier: 安全标识符，用于向 OpenAI 报告违规用户（仅 OpenAI 支持，涉及用户隐私）
+//func RemoveDisabledFields(jsonData []byte, channelOtherSettings dto.ChannelOtherSettings) ([]byte, error) {
+//	var data map[string]interface{}
+//	if err := common.Unmarshal(jsonData, &data); err != nil {
+//		common.SysError("RemoveDisabledFields Unmarshal error :" + err.Error())
+//		return jsonData, nil
+//	}
+//
+//	// 默认移除 service_tier，除非明确允许（避免额外计费风险）
+//	if !channelOtherSettings.AllowServiceTier {
+//		if _, exists := data["service_tier"]; exists {
+//			delete(data, "service_tier")
+//		}
+//	}
+//
+//	// 默认允许 store 透传，除非明确禁用（禁用可能影响 Codex 使用）
+//	if channelOtherSettings.DisableStore {
+//		if _, exists := data["store"]; exists {
+//			delete(data, "store")
+//		}
+//	}
+//
+//	// 默认移除 safety_identifier，除非明确允许（保护用户隐私，避免向 OpenAI 报告用户信息）
+//	if !channelOtherSettings.AllowSafetyIdentifier {
+//		if _, exists := data["safety_identifier"]; exists {
+//			delete(data, "safety_identifier")
+//		}
+//	}
+//
+//	jsonDataAfter, err := common.Marshal(data)
+//	if err != nil {
+//		common.SysError("RemoveDisabledFields Marshal error :" + err.Error())
+//		return jsonData, nil
+//	}
+//	return jsonDataAfter, nil
+//}

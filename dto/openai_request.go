@@ -247,13 +247,13 @@ type StreamOptions struct {
 	IncludeUsage bool `json:"include_usage,omitempty"`
 }
 
-//	func (r *GeneralOpenAIRequest) GetMaxTokens() uint {
-//		if r.MaxCompletionTokens != 0 {
-//			return r.MaxCompletionTokens
-//		}
-//		return r.MaxTokens
-//	}
-//
+func (r *GeneralOpenAIRequest) GetMaxTokens() uint {
+	if r.MaxCompletionTokens != 0 {
+		return r.MaxCompletionTokens
+	}
+	return r.MaxTokens
+}
+
 //	func (r *GeneralOpenAIRequest) ParseInput() []string {
 //		if r.Input == nil {
 //			return nil
@@ -385,18 +385,16 @@ type MediaContent struct {
 //	type MessageVideoUrl struct {
 //		Url string `json:"url"`
 //	}
-//
-// const (
-//
-//	ContentTypeText       = "text"
-//	ContentTypeImageURL   = "image_url"
-//	ContentTypeInputAudio = "input_audio"
-//	ContentTypeFile       = "file"
-//	ContentTypeVideoUrl   = "video_url" // 阿里百炼视频识别
-//	//ContentTypeAudioUrl   = "audio_url"
-//
-// )
-//
+const (
+	ContentTypeText = "text"
+	//ContentTypeImageURL   = "image_url"
+	//ContentTypeInputAudio = "input_audio"
+	//ContentTypeFile       = "file"
+	//ContentTypeVideoUrl   = "video_url" // 阿里百炼视频识别
+	//ContentTypeAudioUrl   = "audio_url"
+
+)
+
 //	func (m *Message) GetPrefix() bool {
 //		if m.Prefix == nil {
 //			return false
@@ -423,30 +421,29 @@ type MediaContent struct {
 //		toolCallsJson, _ := json.Marshal(toolCalls)
 //		m.ToolCalls = toolCallsJson
 //	}
-//
-//	func (m *Message) StringContent() string {
-//		switch m.Content.(type) {
-//		case string:
-//			return m.Content.(string)
-//		case []any:
-//			var contentStr string
-//			for _, contentItem := range m.Content.([]any) {
-//				contentMap, ok := contentItem.(map[string]any)
-//				if !ok {
-//					continue
-//				}
-//				if contentMap["type"] == ContentTypeText {
-//					if subStr, ok := contentMap["text"].(string); ok {
-//						contentStr += subStr
-//					}
-//				}
-//			}
-//			return contentStr
-//		}
-//
-//		return ""
-//	}
-//
+func (m *Message) StringContent() string {
+	switch m.Content.(type) {
+	case string:
+		return m.Content.(string)
+	case []any:
+		var contentStr string
+		for _, contentItem := range m.Content.([]any) {
+			contentMap, ok := contentItem.(map[string]any)
+			if !ok {
+				continue
+			}
+			if contentMap["type"] == ContentTypeText {
+				if subStr, ok := contentMap["text"].(string); ok {
+					contentStr += subStr
+				}
+			}
+		}
+		return contentStr
+	}
+
+	return ""
+}
+
 //	func (m *Message) SetNullContent() {
 //		m.Content = nil
 //		m.parsedContent = nil

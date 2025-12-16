@@ -391,13 +391,13 @@ func (channel *Channel) GetModelMapping() string {
 	return *channel.ModelMapping
 }
 
-//
-//func (channel *Channel) GetStatusCodeMapping() string {
-//	if channel.StatusCodeMapping == nil {
-//		return ""
-//	}
-//	return *channel.StatusCodeMapping
-//}
+func (channel *Channel) GetStatusCodeMapping() string {
+	if channel.StatusCodeMapping == nil {
+		return ""
+	}
+	return *channel.StatusCodeMapping
+}
+
 //
 //func (channel *Channel) Insert() error {
 //	var err error

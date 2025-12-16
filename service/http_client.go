@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"new-api-demo/constant"
 	"sync"
 	"time"
 
@@ -18,12 +19,13 @@ var (
 	proxyClients    = make(map[string]*http.Client)
 )
 
+// checkRedirect SSRF防护校验，目前先不实现
 func checkRedirect(req *http.Request, via []*http.Request) error {
-	fetchSetting := system_setting.GetFetchSetting()
-	urlStr := req.URL.String()
-	if err := common.ValidateURLWithFetchSetting(urlStr, fetchSetting.EnableSSRFProtection, fetchSetting.AllowPrivateIp, fetchSetting.DomainFilterMode, fetchSetting.IpFilterMode, fetchSetting.DomainList, fetchSetting.IpList, fetchSetting.AllowedPorts, fetchSetting.ApplyIPFilterForDomain); err != nil {
-		return fmt.Errorf("redirect to %s blocked: %v", urlStr, err)
-	}
+	//fetchSetting := system_setting.GetFetchSetting()
+	//urlStr := req.URL.String()
+	//if err := common.ValidateURLWithFetchSetting(urlStr, fetchSetting.EnableSSRFProtection, fetchSetting.AllowPrivateIp, fetchSetting.DomainFilterMode, fetchSetting.IpFilterMode, fetchSetting.DomainList, fetchSetting.IpList, fetchSetting.AllowedPorts, fetchSetting.ApplyIPFilterForDomain); err != nil {
+	//	return fmt.Errorf("redirect to %s blocked: %v", urlStr, err)
+	//}
 	if len(via) >= 10 {
 		return fmt.Errorf("stopped after 10 redirects")
 	}
@@ -31,15 +33,20 @@ func checkRedirect(req *http.Request, via []*http.Request) error {
 }
 
 func InitHttpClient() {
-	if common.RelayTimeout == 0 {
-		httpClient = &http.Client{
-			CheckRedirect: checkRedirect,
-		}
-	} else {
-		httpClient = &http.Client{
-			Timeout:       time.Duration(common.RelayTimeout) * time.Second,
-			CheckRedirect: checkRedirect,
-		}
+	//if common.RelayTimeout == 0 {
+	//	httpClient = &http.Client{
+	//		CheckRedirect: checkRedirect,
+	//	}
+	//} else {
+	//	httpClient = &http.Client{
+	//		Timeout:       time.Duration(common.RelayTimeout) * time.Second,
+	//		CheckRedirect: checkRedirect,
+	//	}
+	//}
+
+	httpClient = &http.Client{
+		Timeout:       time.Duration(constant.RelayTimeout) * time.Second,
+		CheckRedirect: checkRedirect,
 	}
 }
 
@@ -85,7 +92,7 @@ func NewProxyHttpClient(proxyURL string) (*http.Client, error) {
 			},
 			CheckRedirect: checkRedirect,
 		}
-		client.Timeout = time.Duration(common.RelayTimeout) * time.Second
+		client.Timeout = time.Duration(constant.RelayTimeout) * time.Second
 		proxyClientLock.Lock()
 		proxyClients[proxyURL] = client
 		proxyClientLock.Unlock()
@@ -119,7 +126,7 @@ func NewProxyHttpClient(proxyURL string) (*http.Client, error) {
 			},
 			CheckRedirect: checkRedirect,
 		}
-		client.Timeout = time.Duration(common.RelayTimeout) * time.Second
+		client.Timeout = time.Duration(constant.RelayTimeout) * time.Second
 		proxyClientLock.Lock()
 		proxyClients[proxyURL] = client
 		proxyClientLock.Unlock()

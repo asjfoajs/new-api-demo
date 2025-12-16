@@ -1,3 +1,4 @@
+// Package claude 暂不实现
 package claude
 
 import (
@@ -10,7 +11,7 @@ import (
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/setting/model_setting"
+	//"new-api-demo/setting/model_setting"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -25,24 +26,24 @@ type Adaptor struct {
 	RequestMode int
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
-	return request, nil
-}
-
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
+//	return request, nil
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	//TODO implement me
 //	return nil, errors.New("not implemented")
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 	if strings.HasPrefix(info.UpstreamModelName, "claude-2") || strings.HasPrefix(info.UpstreamModelName, "claude-instant") {
@@ -66,12 +67,12 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 }
 
 func CommonClaudeHeadersOperation(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) {
-	// common headers operation
-	anthropicBeta := c.Request.Header.Get("anthropic-beta")
-	if anthropicBeta != "" {
-		req.Set("anthropic-beta", anthropicBeta)
-	}
-	model_setting.GetClaudeSettings().WriteHeaders(info.OriginModelName, req)
+	//// common headers operation
+	//anthropicBeta := c.Request.Header.Get("anthropic-beta")
+	//if anthropicBeta != "" {
+	//	req.Set("anthropic-beta", anthropicBeta)
+	//}
+	//model_setting.GetClaudeSettings().WriteHeaders(info.OriginModelName, req)
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
@@ -90,21 +91,22 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
-	if a.RequestMode == RequestModeCompletion {
-		return RequestOpenAI2ClaudeComplete(*request), nil
-	} else {
-		return RequestOpenAI2ClaudeMessage(c, *request)
-	}
-}
-
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	//TODO implement me
+	//if a.RequestMode == RequestModeCompletion {
+	//	return RequestOpenAI2ClaudeComplete(*request), nil
+	//} else {
+	//	return RequestOpenAI2ClaudeMessage(c, *request)
+	//}
 	return nil, errors.New("not implemented")
 }
+
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return nil, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	// TODO implement me
@@ -116,11 +118,11 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.IsStream {
-		return ClaudeStreamHandler(c, resp, info, a.RequestMode)
-	} else {
-		return ClaudeHandler(c, resp, info, a.RequestMode)
-	}
+	//if info.IsStream {
+	//	return ClaudeStreamHandler(c, resp, info, a.RequestMode)
+	//} else {
+	//	return ClaudeHandler(c, resp, info, a.RequestMode)
+	//}
 	return
 }
 

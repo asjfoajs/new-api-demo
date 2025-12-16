@@ -1,17 +1,15 @@
+// Package jimeng 是视频生成，暂不支持。
+// 只保留结构即可，方便后续接入可直接取消注释使用。
 package jimeng
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
 	"new-api-demo/dto"
-	"new-api-demo/relay/channel"
-	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
-	relayconstant "new-api-demo/relay/constant"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -20,14 +18,14 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
-func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	return nil, errors.New("not implemented")
-}
+//func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
@@ -69,31 +67,31 @@ type imageRequestPayload struct {
 	BinaryData []string `json:"binary_data_base64,omitempty"` // Base64 encoded binary data
 }
 
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	payload := imageRequestPayload{
-		ReqKey: request.Model,
-		Prompt: request.Prompt,
-	}
-	if request.ResponseFormat == "" || request.ResponseFormat == "url" {
-		payload.ReturnURL = true // Default to returning image URLs
-	}
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	payload := imageRequestPayload{
+//		ReqKey: request.Model,
+//		Prompt: request.Prompt,
+//	}
+//	if request.ResponseFormat == "" || request.ResponseFormat == "url" {
+//		payload.ReturnURL = true // Default to returning image URLs
+//	}
+//
+//	if len(request.ExtraFields) > 0 {
+//		if err := json.Unmarshal(request.ExtraFields, &payload); err != nil {
+//			return nil, fmt.Errorf("failed to unmarshal extra fields: %w", err)
+//		}
+//	}
+//
+//	return payload, nil
+//}
 
-	if len(request.ExtraFields) > 0 {
-		if err := json.Unmarshal(request.ExtraFields, &payload); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal extra fields: %w", err)
-		}
-	}
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return nil, errors.New("not implemented")
+//}
 
-	return payload, nil
-}
-
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return nil, errors.New("not implemented")
-}
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return nil, errors.New("not implemented")
+//}
 
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	return nil, errors.New("not implemented")
@@ -103,34 +101,36 @@ func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommo
 	return nil, errors.New("not implemented")
 }
 
+// jimeng
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	fullRequestURL, err := a.GetRequestURL(info)
-	if err != nil {
-		return nil, fmt.Errorf("get request url failed: %w", err)
-	}
-	req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
-	if err != nil {
-		return nil, fmt.Errorf("new request failed: %w", err)
-	}
-	err = Sign(c, req, info.ApiKey)
-	if err != nil {
-		return nil, fmt.Errorf("setup request header failed: %w", err)
-	}
-	resp, err := channel.DoRequest(c, req, info)
-	if err != nil {
-		return nil, fmt.Errorf("do request failed: %w", err)
-	}
-	return resp, nil
+	//fullRequestURL, err := a.GetRequestURL(info)
+	//if err != nil {
+	//	return nil, fmt.Errorf("get request url failed: %w", err)
+	//}
+	//req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
+	//if err != nil {
+	//	return nil, fmt.Errorf("new request failed: %w", err)
+	//}
+	//err = Sign(c, req, info.ApiKey)
+	//if err != nil {
+	//	return nil, fmt.Errorf("setup request header failed: %w", err)
+	//}
+	//resp, err := channel.DoRequest(c, req, info)
+	//if err != nil {
+	//	return nil, fmt.Errorf("do request failed: %w", err)
+	//}
+	//return resp, nil
+	return nil, errors.New("not implemented")
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.RelayMode == relayconstant.RelayModeImagesGenerations {
-		usage, err = jimengImageHandler(c, resp, info)
-	} else if info.IsStream {
-		usage, err = openai.OaiStreamHandler(c, info, resp)
-	} else {
-		usage, err = openai.OpenaiHandler(c, info, resp)
-	}
+	//if info.RelayMode == relayconstant.RelayModeImagesGenerations {
+	//	usage, err = jimengImageHandler(c, resp, info)
+	//} else if info.IsStream {
+	//	usage, err = openai.OaiStreamHandler(c, info, resp)
+	//} else {
+	//	usage, err = openai.OpenaiHandler(c, info, resp)
+	//}
 	return
 }
 

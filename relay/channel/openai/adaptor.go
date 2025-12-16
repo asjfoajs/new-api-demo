@@ -23,10 +23,10 @@ import (
 	"new-api-demo/relay/channel/openrouter"
 	"new-api-demo/relay/channel/xinference"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/relay/common_handler"
+	//"new-api-demo/relay/common_handler"
 	relayconstant "new-api-demo/relay/constant"
-	"new-api-demo/service"
-	"new-api-demo/setting/model_setting"
+	//"new-api-demo/service"
+	//"new-api-demo/setting/model_setting"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -96,73 +96,76 @@ func parseReasoningEffortFromModelSuffix(model string) (string, string) {
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 	a.ChannelType = info.ChannelType
 
-	// initialize ThinkingContentInfo when thinking_to_content is enabled
-	if info.ChannelSetting.ThinkingToContent {
-		info.ThinkingContentInfo = relaycommon.ThinkingContentInfo{
-			IsFirstThinkingContent:  true,
-			SendLastThinkingContent: false,
-			HasSentThinkingContent:  false,
-		}
-	}
+	//注意关于表示当前渠道是否开启了「thinking_to_content」功能，一般对应一些模型会返回思维过程（thinking / reasoning），然后网关可以把这部分内容以特定方式合并/转换到最终输出里
+	// 我们先注释掉
+	//// initialize ThinkingContentInfo when thinking_to_content is enabled
+	//if info.ChannelSetting.ThinkingToContent {
+	//	info.ThinkingContentInfo = relaycommon.ThinkingContentInfo{
+	//		IsFirstThinkingContent:  true,  //标记接下来收到的第一段 thinking 内容，需要特殊处理（比如先缓存、不直接下发等）。
+	//		SendLastThinkingContent: false, //控制是否在最后把最新一段 thinking 内容发送出去（有些策略只发最终的、或者只保留最后一段思维）。
+	//		HasSentThinkingContent:  false, //记录在本次请求中是否已经把 thinking 内容发给客户端过，用于避免重复发送或决定后续策略。
+	//	}
+	//}
 }
 
+// GetRequestURL 注意 我将Azure相关的处理注释掉了,如果以后接入Azure云,需要放开
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == relayconstant.RelayModeRealtime {
-		if strings.HasPrefix(info.ChannelBaseUrl, "https://") {
-			baseUrl := strings.TrimPrefix(info.ChannelBaseUrl, "https://")
-			baseUrl = "wss://" + baseUrl
-			info.ChannelBaseUrl = baseUrl
-		} else if strings.HasPrefix(info.ChannelBaseUrl, "http://") {
-			baseUrl := strings.TrimPrefix(info.ChannelBaseUrl, "http://")
-			baseUrl = "ws://" + baseUrl
-			info.ChannelBaseUrl = baseUrl
-		}
-	}
+	//if info.RelayMode == relayconstant.RelayModeRealtime {
+	//	if strings.HasPrefix(info.ChannelBaseUrl, "https://") {
+	//		baseUrl := strings.TrimPrefix(info.ChannelBaseUrl, "https://")
+	//		baseUrl = "wss://" + baseUrl
+	//		info.ChannelBaseUrl = baseUrl
+	//	} else if strings.HasPrefix(info.ChannelBaseUrl, "http://") {
+	//		baseUrl := strings.TrimPrefix(info.ChannelBaseUrl, "http://")
+	//		baseUrl = "ws://" + baseUrl
+	//		info.ChannelBaseUrl = baseUrl
+	//	}
+	//}
 	switch info.ChannelType {
-	case constant.ChannelTypeAzure:
-		apiVersion := info.ApiVersion
-		if apiVersion == "" {
-			apiVersion = constant.AzureDefaultAPIVersion
-		}
-		// https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?pivots=rest-api&tabs=command-line#rest-api
-		requestURL := strings.Split(info.RequestURLPath, "?")[0]
-		requestURL = fmt.Sprintf("%s?api-version=%s", requestURL, apiVersion)
-		task := strings.TrimPrefix(requestURL, "/v1/")
-
-		if info.RelayFormat == types.RelayFormatClaude {
-			task = strings.TrimPrefix(task, "messages")
-			task = "chat/completions" + task
-		}
-
-		// 特殊处理 responses API
-		if info.RelayMode == relayconstant.RelayModeResponses {
-			responsesApiVersion := "preview"
-
-			subUrl := "/openai/v1/responses"
-			if strings.Contains(info.ChannelBaseUrl, "cognitiveservices.azure.com") {
-				subUrl = "/openai/responses"
-				responsesApiVersion = apiVersion
-			}
-
-			if info.ChannelOtherSettings.AzureResponsesVersion != "" {
-				responsesApiVersion = info.ChannelOtherSettings.AzureResponsesVersion
-			}
-
-			requestURL = fmt.Sprintf("%s?api-version=%s", subUrl, responsesApiVersion)
-			return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, requestURL, info.ChannelType), nil
-		}
-
-		model_ := info.UpstreamModelName
-		// 2025年5月10日后创建的渠道不移除.
-		if info.ChannelCreateTime < constant.AzureNoRemoveDotTime {
-			model_ = strings.Replace(model_, ".", "", -1)
-		}
-		// https://github.com/songquanpeng/one-api/issues/67
-		requestURL = fmt.Sprintf("/openai/deployments/%s/%s", model_, task)
-		if info.RelayMode == relayconstant.RelayModeRealtime {
-			requestURL = fmt.Sprintf("/openai/realtime?deployment=%s&api-version=%s", model_, apiVersion)
-		}
-		return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, requestURL, info.ChannelType), nil
+	//case constant.ChannelTypeAzure:
+	//	apiVersion := info.ApiVersion
+	//	if apiVersion == "" {
+	//		apiVersion = constant.AzureDefaultAPIVersion
+	//	}
+	//	// https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?pivots=rest-api&tabs=command-line#rest-api
+	//	requestURL := strings.Split(info.RequestURLPath, "?")[0]
+	//	requestURL = fmt.Sprintf("%s?api-version=%s", requestURL, apiVersion)
+	//	task := strings.TrimPrefix(requestURL, "/v1/")
+	//
+	//	if info.RelayFormat == types.RelayFormatClaude {
+	//		task = strings.TrimPrefix(task, "messages")
+	//		task = "chat/completions" + task
+	//	}
+	//
+	//	// 特殊处理 responses API
+	//	if info.RelayMode == relayconstant.RelayModeResponses {
+	//		responsesApiVersion := "preview"
+	//
+	//		subUrl := "/openai/v1/responses"
+	//		if strings.Contains(info.ChannelBaseUrl, "cognitiveservices.azure.com") {
+	//			subUrl = "/openai/responses"
+	//			responsesApiVersion = apiVersion
+	//		}
+	//
+	//		if info.ChannelOtherSettings.AzureResponsesVersion != "" {
+	//			responsesApiVersion = info.ChannelOtherSettings.AzureResponsesVersion
+	//		}
+	//
+	//		requestURL = fmt.Sprintf("%s?api-version=%s", subUrl, responsesApiVersion)
+	//		return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, requestURL, info.ChannelType), nil
+	//	}
+	//
+	//	model_ := info.UpstreamModelName
+	//	// 2025年5月10日后创建的渠道不移除.
+	//	if info.ChannelCreateTime < constant.AzureNoRemoveDotTime {
+	//		model_ = strings.Replace(model_, ".", "", -1)
+	//	}
+	//	// https://github.com/songquanpeng/one-api/issues/67
+	//	requestURL = fmt.Sprintf("/openai/deployments/%s/%s", model_, task)
+	//	if info.RelayMode == relayconstant.RelayModeRealtime {
+	//		requestURL = fmt.Sprintf("/openai/realtime?deployment=%s&api-version=%s", model_, apiVersion)
+	//	}
+	//	return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, requestURL, info.ChannelType), nil
 	//case constant.ChannelTypeMiniMax:
 	//	return minimax.GetRequestURL(info)
 	case constant.ChannelTypeCustom:
@@ -170,9 +173,9 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		url = strings.Replace(url, "{model}", info.UpstreamModelName, -1)
 		return url, nil
 	default:
-		if info.RelayFormat == types.RelayFormatClaude || info.RelayFormat == types.RelayFormatGemini {
-			return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
-		}
+		//if info.RelayFormat == types.RelayFormatClaude || info.RelayFormat == types.RelayFormatGemini {
+		//	return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
+		//}
 		return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, info.RequestURLPath, info.ChannelType), nil
 	}
 }
@@ -333,13 +336,13 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	return request, nil
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return request, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return request, nil
-}
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return request, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return request, nil
+//}
 
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	a.ResponseFormat = request.ResponseFormat

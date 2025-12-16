@@ -1,3 +1,4 @@
+// Package cohere 是国外的一款大模型，想gemini一样都有自己的一套格式
 package cohere
 
 import (
@@ -9,7 +10,6 @@ import (
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/relay/constant"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -18,36 +18,36 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	//TODO implement me
-	panic("implement me")
-	return nil, nil
-}
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
+//	//TODO implement me
+//	panic("implement me")
+//	return nil, nil
+//}
 
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	//TODO implement me
 //	return nil, errors.New("not implemented")
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == constant.RelayModeRerank {
-		return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-	} else {
-		return fmt.Sprintf("%s/v1/chat", info.ChannelBaseUrl), nil
-	}
+	//if info.RelayMode == constant.RelayModeRerank {
+	//	return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
+	//} else {
+	return fmt.Sprintf("%s/v1/chat", info.ChannelBaseUrl), nil
+	//}
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
@@ -57,7 +57,8 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *rel
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
-	return requestOpenAI2Cohere(*request), nil
+	//return requestOpenAI2Cohere(*request), nil
+	return nil, nil
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
@@ -69,25 +70,24 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return requestConvertRerank2Cohere(request), nil
-}
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return requestConvertRerank2Cohere(request), nil
+//}
 
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.RelayMode == constant.RelayModeRerank {
-		usage, err = cohereRerankHandler(c, resp, info)
-	} else {
-		if info.IsStream {
-			usage, err = cohereStreamHandler(c, info, resp) // TODO: fix this
-		} else {
-			usage, err = cohereHandler(c, info, resp)
-		}
-	}
+	//if info.RelayMode == constant.RelayModeRerank {
+	//	usage, err = cohereRerankHandler(c, resp, info)
+	//} else {
+	//if info.IsStream {
+	//	usage, err = cohereStreamHandler(c, info, resp) // TODO: fix this
+	//} else {
+	//	usage, err = cohereHandler(c, info, resp)
+	//}
 	return
 }
 

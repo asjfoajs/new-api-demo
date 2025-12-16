@@ -1,3 +1,4 @@
+// Package jina 是专门做Rerank和Embeddings的，我们也不支持
 package jina
 
 import (
@@ -10,7 +11,7 @@ import (
 	"new-api-demo/relay/channel"
 	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/relay/common_handler"
+	//"new-api-demo/relay/common_handler"
 	"new-api-demo/relay/constant"
 	"new-api-demo/types"
 
@@ -20,36 +21,36 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	//TODO implement me
-	panic("implement me")
-	return nil, nil
-}
-
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
+//	//TODO implement me
+//	panic("implement me")
+//	return nil, nil
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	//TODO implement me
 //	return nil, errors.New("not implemented")
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == constant.RelayModeRerank {
-		return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-	} else if info.RelayMode == constant.RelayModeEmbeddings {
-		return fmt.Sprintf("%s/v1/embeddings", info.ChannelBaseUrl), nil
-	}
+	//if info.RelayMode == constant.RelayModeRerank {
+	//	return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
+	//} else if info.RelayMode == constant.RelayModeEmbeddings {
+	//	return fmt.Sprintf("%s/v1/embeddings", info.ChannelBaseUrl), nil
+	//}
 	return "", errors.New("invalid relay mode")
 }
 
@@ -72,21 +73,21 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return request, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	request.EncodingFormat = ""
-	return request, nil
-}
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return request, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	request.EncodingFormat = ""
+//	return request, nil
+//}
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.RelayMode == constant.RelayModeRerank {
-		usage, err = common_handler.RerankHandler(c, info, resp)
-	} else if info.RelayMode == constant.RelayModeEmbeddings {
-		usage, err = openai.OpenaiHandler(c, info, resp)
-	}
+	//if info.RelayMode == constant.RelayModeRerank {
+	//	usage, err = common_handler.RerankHandler(c, info, resp)
+	//} else if info.RelayMode == constant.RelayModeEmbeddings {
+	//	usage, err = openai.OpenaiHandler(c, info, resp)
+	//}
 	return
 }
 
