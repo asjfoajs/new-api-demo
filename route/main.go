@@ -32,10 +32,26 @@ func SetRelayRouter(router *gin.Engine) {
 
 		// chat related routes
 		httpRouter.POST("/completions", func(c *gin.Context) {
-			controller.Relay(c, types.RelayFormatOpenAI)
+			//controller.Relay(c, types.RelayFormatOpenAI)
+			chatCompletions(c)
 		})
 		httpRouter.POST("/chat/completions", func(c *gin.Context) {
-			controller.Relay(c, types.RelayFormatOpenAI)
+			//controller.Relay(c, types.RelayFormatOpenAI)
+			chatCompletions(c)
 		})
 	}
+}
+
+// ChatCompletions godoc
+// @Summary Chat Completions
+// @Description 支持流式与非流式聊天补全。
+// @Tags 聊天
+// @Accept json
+// @Produce json
+// @Param request body ChatCompletionRequest true "OpenAI ChatCompletion 请求体"
+// @Success 200 {object} ChatCompletionResponse "非流式 JSON 响应"
+// @Success 200 {string} ChatCompletionStreamResponse "text/event-stream 流式响应"
+// @Router /v1/chat/completions [post]
+func chatCompletions(c *gin.Context) {
+	controller.Relay(c, types.RelayFormatOpenAI)
 }
