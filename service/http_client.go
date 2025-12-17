@@ -47,7 +47,27 @@ func InitHttpClient() {
 	httpClient = &http.Client{
 		Timeout:       time.Duration(constant.RelayTimeout) * time.Second,
 		CheckRedirect: checkRedirect,
+		Transport: &http.Transport{
+			// MaxIdleConns 定义了所有主机（Host）共享的最大空闲连接数。
+			// 即使你访问了多个不同的网站，总共留在内存中等待复用的连接不会超过这个数。
+			MaxIdleConns: 100,
+
+			// MaxIdleConnsPerHost 定义了“每个主机”允许保留的最大空闲连接数。
+			// 这是最重要的参数：在高并发访问同一个 API 服务时，默认值通常很小（默认 2），
+			// 将其调大（如 100）可以显著减少频繁创建 TCP 连接带来的延迟。
+			MaxIdleConnsPerHost: 100,
+
+			// IdleConnTimeout 定义了一个空闲连接在被自动关闭之前，可以在连接池中存放的最长时间。
+			// 90 秒表示如果一个连接在 90 秒内没有被再次使用，它将被强制关闭以释放系统资源。
+			IdleConnTimeout: 90 * time.Second,
+
+			// DisableKeepAlives 控制是否禁用 HTTP 长连接。
+			// 设置为 false 表示“开启 Keep-Alive”，即允许连接复用。
+			// 在绝大多数生产场景下，为了性能都应该保持为 false。
+			DisableKeepAlives: false,
+		},
 	}
+
 }
 
 func GetHttpClient() *http.Client {
