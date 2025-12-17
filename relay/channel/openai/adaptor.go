@@ -205,6 +205,7 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, header *http.Header, info *
 	header.Set("Authorization", "Bearer "+info.ApiKey)
 	//}
 	if info.ChannelType == constant.ChannelTypeOpenRouter {
+		//改成自己的网站域名
 		header.Set("HTTP-Referer", "https://www.newapi.ai")
 		header.Set("X-Title", "New API")
 	}

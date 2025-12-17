@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"new-api-demo/model"
 	"new-api-demo/route"
 	"new-api-demo/service"
 	"time"
@@ -157,7 +158,7 @@ func handleChatCompletions(c *gin.Context) {
 }
 
 func main() {
-
+	model.InitChannelCache()
 	service.InitHttpClient()
 	service.InitTokenEncoders()
 	// 创建 Gin 路由
@@ -166,7 +167,7 @@ func main() {
 	route.SetRouter(router)
 
 	// 启动服务器
-	port := ":8080"
+	port := ":13000"
 	log.Printf("Demo server starting on port %s", port)
 	log.Printf("Available endpoints:")
 	log.Printf("  POST http://localhost%s/v1/completions", port)

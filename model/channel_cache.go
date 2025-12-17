@@ -20,14 +20,17 @@ func InitChannelCache() {
 	priority1, priority2, priority3 := int64(1), int64(2), int64(3)
 
 	model2channels = map[string][]int{
-		"qwen3-max": {1, 2, 3},
+		"deepseek-ai/DeepSeek-V3.1": {1, 2, 3},
 	}
-	baseUrl := "https://dashscope.aliyuncs.com"
-	key := "*********"
+	baseUrl := "https://www.sophnet.com/api/open-apis/v1/chat/completions"
+	key := "**************************************************"
+	modelMapping := `{
+	"deepseek-ai/DeepSeek-V3.1": "DeepSeek-V3.1"
+	}`
 	channelsIDM = map[int]*Channel{
-		1: {Id: 1, Name: "channel1", Type: 17, Weight: &weight1, Priority: &priority1, BaseURL: &baseUrl, Key: key},
-		2: {Id: 2, Name: "channel2", Type: 17, Weight: &weight2, Priority: &priority2, BaseURL: &baseUrl, Key: key},
-		3: {Id: 3, Name: "channel3", Type: 17, Weight: &weight3, Priority: &priority3, BaseURL: &baseUrl, Key: key},
+		1: {Id: 1, Name: "channel1", Type: 8, Weight: &weight1, Priority: &priority1, BaseURL: &baseUrl, Key: key, ModelMapping: &modelMapping},
+		2: {Id: 2, Name: "channel2", Type: 8, Weight: &weight2, Priority: &priority2, BaseURL: &baseUrl, Key: key, ModelMapping: &modelMapping},
+		3: {Id: 3, Name: "channel3", Type: 8, Weight: &weight3, Priority: &priority3, BaseURL: &baseUrl, Key: key, ModelMapping: &modelMapping},
 	}
 }
 
