@@ -4,10 +4,7 @@ go 1.23.0
 
 require (
 	github.com/andybalholm/brotli v1.2.0
-	github.com/aws/aws-sdk-go-v2 v1.41.0
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.5
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.47.1
-	github.com/aws/smithy-go v1.24.0
 	github.com/bytedance/gopkg v0.1.3
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.10.1
@@ -18,13 +15,16 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.52.0
 	github.com/tiktoken-go/tokenizer v0.7.0
+	golang.org/x/crypto v0.39.0
 	golang.org/x/net v0.41.0
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2 v1.41.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.16 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.16 // indirect
+	github.com/aws/smithy-go v1.24.0 // indirect
 	github.com/bytedance/sonic v1.13.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
@@ -46,8 +46,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.0 // indirect
 	golang.org/x/arch v0.18.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect

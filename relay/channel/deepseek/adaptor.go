@@ -7,38 +7,39 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
-	"new-api-demo/relay/channel/claude"
 	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
 	"new-api-demo/relay/constant"
 	"new-api-demo/types"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	adaptor := claude.Adaptor{}
-	return adaptor.ConvertClaudeRequest(c, info, req)
-}
-
+//
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
+//	adaptor := claude.Adaptor{}
+//	return adaptor.ConvertClaudeRequest(c, info, req)
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	//TODO implement me
 //	return nil, errors.New("not implemented")
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
@@ -46,8 +47,8 @@ func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 	fimBaseUrl := info.ChannelBaseUrl
 	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
+	//case types.RelayFormatClaude:
+	//	return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
 	default:
 		if !strings.HasSuffix(info.ChannelBaseUrl, "/beta") {
 			fimBaseUrl += "/beta"
@@ -74,14 +75,15 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	return request, nil
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return nil, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	// TODO implement me
@@ -94,12 +96,12 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		if info.IsStream {
-			return claude.ClaudeStreamHandler(c, resp, info, claude.RequestModeMessage)
-		} else {
-			return claude.ClaudeHandler(c, resp, info, claude.RequestModeMessage)
-		}
+	//case types.RelayFormatClaude:
+	//	if info.IsStream {
+	//		return claude.ClaudeStreamHandler(c, resp, info, claude.RequestModeMessage)
+	//	} else {
+	//		return claude.ClaudeHandler(c, resp, info, claude.RequestModeMessage)
+	//	}
 	default:
 		adaptor := openai.Adaptor{}
 		return adaptor.DoResponse(c, resp, info)

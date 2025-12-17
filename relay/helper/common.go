@@ -49,17 +49,16 @@ func SetEventStreamHeaders(c *gin.Context) {
 //	return nil
 //}
 
-//func ClaudeChunkData(c *gin.Context, resp dto.ClaudeResponse, data string) {
-//	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("event: %s\n", resp.Type)})
-//	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("data: %s\n", data)})
-//	_ = FlushWriter(c)
-//}
-//
-//func ResponseChunkData(c *gin.Context, resp dto.ResponsesStreamResponse, data string) {
-//	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("event: %s\n", resp.Type)})
-//	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("data: %s", data)})
-//	_ = FlushWriter(c)
-//}
+//	func ClaudeChunkData(c *gin.Context, resp dto.ClaudeResponse, data string) {
+//		c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("event: %s\n", resp.Type)})
+//		c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("data: %s\n", data)})
+//		_ = FlushWriter(c)
+//	}
+func ResponseChunkData(c *gin.Context, resp dto.ResponsesStreamResponse, data string) {
+	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("event: %s\n", resp.Type)})
+	c.Render(-1, common.CustomEvent{Data: fmt.Sprintf("data: %s", data)})
+	_ = FlushWriter(c)
+}
 
 func StringData(c *gin.Context, str string) error {
 	//str = strings.TrimPrefix(str, "data: ")

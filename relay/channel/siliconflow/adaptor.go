@@ -6,12 +6,10 @@ import (
 	"io"
 	"net/http"
 
-	"new-api-demo/common"
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
 	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/relay/constant"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -20,52 +18,52 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.ConvertClaudeRequest(c, info, req)
-}
-
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
+//	adaptor := openai.Adaptor{}
+//	return adaptor.ConvertClaudeRequest(c, info, req)
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	adaptor := openai.Adaptor{}
 //	return adaptor.ConvertAudioRequest(c, info, request)
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	// 解析extra到SFImageRequest里，以填入SiliconFlow特殊字段。若失败重建一个空的。
-	sfRequest := &SFImageRequest{}
-	extra, err := common.Marshal(request.Extra)
-	if err == nil {
-		err = common.Unmarshal(extra, sfRequest)
-		if err != nil {
-			sfRequest = &SFImageRequest{}
-		}
-	}
-
-	sfRequest.Model = request.Model
-	sfRequest.Prompt = request.Prompt
-	// 优先使用image_size/batch_size，否则使用OpenAI标准的size/n
-	if sfRequest.ImageSize == "" {
-		sfRequest.ImageSize = request.Size
-	}
-	if sfRequest.BatchSize == 0 {
-		sfRequest.BatchSize = request.N
-	}
-
-	return sfRequest, nil
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	// 解析extra到SFImageRequest里，以填入SiliconFlow特殊字段。若失败重建一个空的。
+//	sfRequest := &SFImageRequest{}
+//	extra, err := common.Marshal(request.Extra)
+//	if err == nil {
+//		err = common.Unmarshal(extra, sfRequest)
+//		if err != nil {
+//			sfRequest = &SFImageRequest{}
+//		}
+//	}
+//
+//	sfRequest.Model = request.Model
+//	sfRequest.Prompt = request.Prompt
+//	// 优先使用image_size/batch_size，否则使用OpenAI标准的size/n
+//	if sfRequest.ImageSize == "" {
+//		sfRequest.ImageSize = request.Size
+//	}
+//	if sfRequest.BatchSize == 0 {
+//		sfRequest.BatchSize = request.N
+//	}
+//
+//	return sfRequest, nil
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == constant.RelayModeRerank {
-		return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-	}
+	//if info.RelayMode == constant.RelayModeRerank {
+	//	return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
+	//}
 	return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, info.RequestURLPath, info.ChannelType), nil
 }
 
@@ -99,18 +97,19 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return adaptor.DoRequest(c, info, requestBody)
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return request, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return request, nil
-}
+//
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return request, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return request, nil
+//}
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	switch info.RelayMode {
-	case constant.RelayModeRerank:
-		usage, err = siliconflowRerankHandler(c, info, resp)
+	//case constant.RelayModeRerank:
+	//	usage, err = siliconflowRerankHandler(c, info, resp)
 	default:
 		adaptor := openai.Adaptor{}
 		usage, err = adaptor.DoResponse(c, resp, info)

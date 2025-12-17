@@ -9,9 +9,10 @@ func Unmarshal(data []byte, v any) error {
 	return json.Unmarshal(data, v)
 }
 
-//func UnmarshalJsonStr(data string, v any) error {
-//	return json.Unmarshal(StringToByteSlice(data), v)
-//}
+func UnmarshalJsonStr(data string, v any) error {
+	return json.Unmarshal(StringToByteSlice(data), v)
+}
+
 //
 //func DecodeJson(reader io.Reader, v any) error {
 //	return json.NewDecoder(reader).Decode(v)

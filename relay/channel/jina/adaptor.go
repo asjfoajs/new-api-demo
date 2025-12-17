@@ -9,10 +9,10 @@ import (
 
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
-	"new-api-demo/relay/channel/openai"
+	//"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
 	//"new-api-demo/relay/common_handler"
-	"new-api-demo/relay/constant"
+	//"new-api-demo/relay/constant"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"

@@ -9,7 +9,6 @@ import (
 	"new-api-demo/relay/channel"
 	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
-	"new-api-demo/relay/constant"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
@@ -18,14 +17,15 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	return nil, errors.New("not implemented")
-}
-
+//
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
+//	return nil, errors.New("not implemented")
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	if info.RelayMode != constant.RelayModeAudioSpeech {
 //		return nil, errors.New("unsupported audio relay mode")
@@ -70,10 +70,10 @@ func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayIn
 //
 //	return bytes.NewReader(jsonData), nil
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	return request, nil
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	return request, nil
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
@@ -95,13 +95,14 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	return request, nil
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return request, nil
-}
+//
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return nil, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return request, nil
+//}
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	return nil, errors.New("not implemented")
@@ -112,9 +113,9 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if info.RelayMode == constant.RelayModeAudioSpeech {
-		return handleTTSResponse(c, resp, info)
-	}
+	//if info.RelayMode == constant.RelayModeAudioSpeech {
+	//	return handleTTSResponse(c, resp, info)
+	//}
 
 	adaptor := openai.Adaptor{}
 	return adaptor.DoResponse(c, resp, info)

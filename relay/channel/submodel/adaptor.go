@@ -17,21 +17,22 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
-	return nil, errors.New("submodel channel: endpoint not supported")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	return nil, errors.New("submodel channel: endpoint not supported")
-}
-
+//
+//func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+//	return nil, errors.New("submodel channel: endpoint not supported")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
+//	return nil, errors.New("submodel channel: endpoint not supported")
+//}
+//
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	return nil, errors.New("submodel channel: endpoint not supported")
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	return nil, errors.New("submodel channel: endpoint not supported")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	return nil, errors.New("submodel channel: endpoint not supported")
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
@@ -53,13 +54,14 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	return request, nil
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, errors.New("submodel channel: endpoint not supported")
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return nil, errors.New("submodel channel: endpoint not supported")
-}
+//
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return nil, errors.New("submodel channel: endpoint not supported")
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return nil, errors.New("submodel channel: endpoint not supported")
+//}
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	return nil, errors.New("submodel channel: endpoint not supported")

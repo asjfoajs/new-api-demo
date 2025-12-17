@@ -65,7 +65,7 @@ type ChannelMeta struct {
 	//ChannelMultiKeyIndex int
 	ChannelBaseUrl string
 	ApiType        int
-	//ApiVersion        string
+	//ApiVersion     string
 	ApiKey       string
 	Organization string
 	//ChannelCreateTime int64
@@ -122,7 +122,7 @@ type RelayInfo struct {
 	ThinkingContentInfo
 	//*ClaudeConvertInfo
 	//*RerankerInfo
-	//*ResponsesUsageInfo
+	*ResponsesUsageInfo
 	*ChannelMeta
 	//*TaskRelayInfo
 }
@@ -139,7 +139,7 @@ func (info *RelayInfo) InitChannelMeta(c *gin.Context) {
 		//ChannelMultiKeyIndex: common.GetContextKeyInt(c, constant.ContextKeyChannelMultiKeyIndex),
 		ChannelBaseUrl: common.GetContextKeyString(c, constant.ContextKeyChannelBaseUrl),
 		ApiType:        apiType,
-		//ApiVersion:           c.GetString("api_version"),
+		//	ApiVersion:     c.GetString("api_version"),
 		ApiKey: common.GetContextKeyString(c, constant.ContextKeyChannelKey),
 		//Organization: c.GetString("channel_organization"),
 		Organization: common.GetContextKeyString(c, constant.ContextKeyChannelOrganization), //组织计费用的

@@ -1,15 +1,11 @@
 package openai
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
-	"net/textproto"
-	"path/filepath"
 	"strings"
 
 	"new-api-demo/common"
@@ -23,10 +19,9 @@ import (
 	"new-api-demo/relay/channel/openrouter"
 	"new-api-demo/relay/channel/xinference"
 	relaycommon "new-api-demo/relay/common"
-	//"new-api-demo/relay/common_handler"
-	relayconstant "new-api-demo/relay/constant"
+
 	//"new-api-demo/service"
-	//"new-api-demo/setting/model_setting"
+	"new-api-demo/setting/model_setting"
 	"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"

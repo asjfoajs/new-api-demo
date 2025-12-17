@@ -204,7 +204,16 @@ func OpenaiHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Respo
 	//	println("upstream response body:", string(responseBody))
 	//}
 	// Unmarshal to simpleResponse
-	if info.ChannelType == constant.ChannelTypeOpenRouter && info.ChannelOtherSettings.IsOpenRouterEnterprise() {
+	//if info.ChannelType == constant.ChannelTypeOpenRouter && info.ChannelOtherSettings.IsOpenRouterEnterprise() {
+	//先去掉 info.ChannelOtherSettings.IsOpenRouterEnterprise() 判断，这个参数是前端传递的参数，这里去掉
+	//作用：标准openai返回的是{ "id": "chatcmpl-123", "choices": [...] }
+	//而 OpenRouter Enterprise 可能会返回
+	//{
+	//  "success": true,
+	//  "data": { "id": "chatcmpl-123", "choices": [...] }
+	//}
+	//再做一次转换
+	if info.ChannelType == constant.ChannelTypeOpenRouter {
 		// 尝试解析为 openrouter enterprise
 		var enterpriseResponse openrouter.OpenRouterEnterpriseResponse
 		err = common.Unmarshal(responseBody, &enterpriseResponse)

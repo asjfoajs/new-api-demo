@@ -8,7 +8,6 @@ import (
 
 	"new-api-demo/dto"
 	"new-api-demo/relay/channel"
-	"new-api-demo/relay/channel/openai"
 	relaycommon "new-api-demo/relay/common"
 	"new-api-demo/relay/constant"
 	"new-api-demo/types"
@@ -19,31 +18,33 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	//TODO implement me
-	panic("implement me")
-	return nil, nil
-}
+//
+//func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
+//
+//func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
+//	//TODO implement me
+//	panic("implement me")
+//	return nil, nil
+//}
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	switch info.RelayMode {
-	case constant.RelayModeChatCompletions:
-		return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/chat/completions", info.ChannelBaseUrl, info.ApiVersion), nil
-	case constant.RelayModeEmbeddings:
-		return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/embeddings", info.ChannelBaseUrl, info.ApiVersion), nil
-	case constant.RelayModeResponses:
-		return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/responses", info.ChannelBaseUrl, info.ApiVersion), nil
-	default:
-		return fmt.Sprintf("%s/client/v4/accounts/%s/ai/run/%s", info.ChannelBaseUrl, info.ApiVersion, info.UpstreamModelName), nil
-	}
+	//switch info.RelayMode {
+	//case constant.RelayModeChatCompletions:
+	//	return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/chat/completions", info.ChannelBaseUrl, info.ApiVersion), nil
+	//case constant.RelayModeEmbeddings:
+	//	return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/embeddings", info.ChannelBaseUrl, info.ApiVersion), nil
+	//case constant.RelayModeResponses:
+	//	return fmt.Sprintf("%s/client/v4/accounts/%s/ai/v1/responses", info.ChannelBaseUrl, info.ApiVersion), nil
+	//default:
+	//	return fmt.Sprintf("%s/client/v4/accounts/%s/ai/run/%s", info.ChannelBaseUrl, info.ApiVersion, info.UpstreamModelName), nil
+	//}
+	return "", nil
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
@@ -72,13 +73,14 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return request, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return request, nil
-}
+//
+//func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
+//	return request, nil
+//}
+//
+//func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
+//	return request, nil
+//}
 
 //func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
 //	// 添加文件字段
@@ -96,28 +98,28 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 //	}
 //	return requestBody, nil
 //}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
+//
+//func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+//	//TODO implement me
+//	return nil, errors.New("not implemented")
+//}
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	switch info.RelayMode {
-	case constant.RelayModeEmbeddings:
-		fallthrough
+	//case constant.RelayModeEmbeddings:
+	//	fallthrough
 	case constant.RelayModeChatCompletions:
 		if info.IsStream {
 			err, usage = cfStreamHandler(c, info, resp)
 		} else {
 			err, usage = cfHandler(c, info, resp)
 		}
-	case constant.RelayModeResponses:
-		if info.IsStream {
-			usage, err = openai.OaiResponsesStreamHandler(c, info, resp)
-		} else {
-			usage, err = openai.OaiResponsesHandler(c, info, resp)
-		}
+		//case constant.RelayModeResponses:
+		//	if info.IsStream {
+		//		usage, err = openai.OaiResponsesStreamHandler(c, info, resp)
+		//	} else {
+		//		usage, err = openai.OaiResponsesHandler(c, info, resp)
+		//	}
 		//case constant.RelayModeAudioTranslation:
 		//	fallthrough
 		//case constant.RelayModeAudioTranscription:

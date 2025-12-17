@@ -72,7 +72,7 @@ type GeneralOpenAIRequest struct {
 	//xai
 	SearchParameters json.RawMessage `json:"search_parameters,omitempty"`
 	// claude
-	//WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
+	WebSearchOptions *WebSearchOptions `json:"web_search_options,omitempty"`
 	// OpenRouter Params
 	Usage     json.RawMessage `json:"usage,omitempty"`
 	Reasoning json.RawMessage `json:"reasoning,omitempty"`
@@ -296,23 +296,23 @@ type MediaContent struct {
 	CacheControl json.RawMessage `json:"cache_control,omitempty"`
 }
 
-//	func (m *MediaContent) GetImageMedia() *MessageImageUrl {
-//		if m.ImageUrl != nil {
-//			if _, ok := m.ImageUrl.(*MessageImageUrl); ok {
-//				return m.ImageUrl.(*MessageImageUrl)
-//			}
-//			if itemMap, ok := m.ImageUrl.(map[string]any); ok {
-//				out := &MessageImageUrl{
-//					Url:      common.Interface2String(itemMap["url"]),
-//					Detail:   common.Interface2String(itemMap["detail"]),
-//					MimeType: common.Interface2String(itemMap["mime_type"]),
-//				}
-//				return out
-//			}
-//		}
-//		return nil
-//	}
-//
+func (m *MediaContent) GetImageMedia() *MessageImageUrl {
+	if m.ImageUrl != nil {
+		if _, ok := m.ImageUrl.(*MessageImageUrl); ok {
+			return m.ImageUrl.(*MessageImageUrl)
+		}
+		if itemMap, ok := m.ImageUrl.(map[string]any); ok {
+			out := &MessageImageUrl{
+				Url:      common.Interface2String(itemMap["url"]),
+				Detail:   common.Interface2String(itemMap["detail"]),
+				MimeType: common.Interface2String(itemMap["mime_type"]),
+			}
+			return out
+		}
+	}
+	return nil
+}
+
 //	func (m *MediaContent) GetInputAudio() *MessageInputAudio {
 //		if m.InputAudio != nil {
 //			if _, ok := m.InputAudio.(*MessageInputAudio); ok {
@@ -360,13 +360,12 @@ type MediaContent struct {
 //		}
 //		return nil
 //	}
-//
-//	type MessageImageUrl struct {
-//		Url      string `json:"url"`
-//		Detail   string `json:"detail"`
-//		MimeType string
-//	}
-//
+type MessageImageUrl struct {
+	Url      string `json:"url"`
+	Detail   string `json:"detail"`
+	MimeType string
+}
+
 //	func (m *MessageImageUrl) IsRemoteImage() bool {
 //		return strings.HasPrefix(m.Url, "http")
 //	}
@@ -386,8 +385,8 @@ type MediaContent struct {
 //		Url string `json:"url"`
 //	}
 const (
-	ContentTypeText = "text"
-	//ContentTypeImageURL   = "image_url"
+	ContentTypeText     = "text"
+	ContentTypeImageURL = "image_url"
 	//ContentTypeInputAudio = "input_audio"
 	//ContentTypeFile       = "file"
 	//ContentTypeVideoUrl   = "video_url" // 阿里百炼视频识别
@@ -405,22 +404,21 @@ const (
 //	func (m *Message) SetPrefix(prefix bool) {
 //		m.Prefix = &prefix
 //	}
-//
-//	func (m *Message) ParseToolCalls() []ToolCallRequest {
-//		if m.ToolCalls == nil {
-//			return nil
-//		}
-//		var toolCalls []ToolCallRequest
-//		if err := json.Unmarshal(m.ToolCalls, &toolCalls); err == nil {
-//			return toolCalls
-//		}
-//		return toolCalls
-//	}
-//
-//	func (m *Message) SetToolCalls(toolCalls any) {
-//		toolCallsJson, _ := json.Marshal(toolCalls)
-//		m.ToolCalls = toolCallsJson
-//	}
+func (m *Message) ParseToolCalls() []ToolCallRequest {
+	if m.ToolCalls == nil {
+		return nil
+	}
+	var toolCalls []ToolCallRequest
+	if err := json.Unmarshal(m.ToolCalls, &toolCalls); err == nil {
+		return toolCalls
+	}
+	return toolCalls
+}
+
+func (m *Message) SetToolCalls(toolCalls any) {
+	toolCallsJson, _ := json.Marshal(toolCalls)
+	m.ToolCalls = toolCallsJson
+}
 func (m *Message) StringContent() string {
 	switch m.Content.(type) {
 	case string:
@@ -453,19 +451,17 @@ func (m *Message) StringContent() string {
 //		m.Content = content
 //		m.parsedContent = nil
 //	}
-//
-//	func (m *Message) SetMediaContent(content []MediaContent) {
-//		m.Content = content
-//		m.parsedContent = content
-//	}
-//
-//	func (m *Message) IsStringContent() bool {
-//		_, ok := m.Content.(string)
-//		if ok {
-//			return true
-//		}
-//		return false
-//	}
+func (m *Message) SetMediaContent(content []MediaContent) {
+	m.Content = content
+	m.parsedContent = content
+}
+func (m *Message) IsStringContent() bool {
+	_, ok := m.Content.(string)
+	if ok {
+		return true
+	}
+	return false
+}
 func (m *Message) ParseContent() []MediaContent {
 	if m.Content == nil {
 		return nil

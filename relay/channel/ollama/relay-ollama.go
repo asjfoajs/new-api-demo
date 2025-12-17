@@ -3,15 +3,14 @@ package ollama
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strings"
-
-	"new-api-demo/common"
 	"new-api-demo/dto"
-	relaycommon "new-api-demo/relay/common"
 	"new-api-demo/service"
-	"new-api-demo/types"
+	"strings"
+	//"io"
+	//"net/http"
+	//"new-api-demo/common"
+	//relaycommon "new-api-demo/relay/common"
+	//"new-api-demo/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -233,53 +232,54 @@ func openAIToGenerate(c *gin.Context, r *dto.GeneralOpenAIRequest) (*OllamaGener
 	return gen, nil
 }
 
-func requestOpenAI2Embeddings(r dto.EmbeddingRequest) *OllamaEmbeddingRequest {
-	opts := map[string]any{}
-	if r.Temperature != nil {
-		opts["temperature"] = r.Temperature
-	}
-	if r.TopP != 0 {
-		opts["top_p"] = r.TopP
-	}
-	if r.FrequencyPenalty != 0 {
-		opts["frequency_penalty"] = r.FrequencyPenalty
-	}
-	if r.PresencePenalty != 0 {
-		opts["presence_penalty"] = r.PresencePenalty
-	}
-	if r.Seed != 0 {
-		opts["seed"] = int(r.Seed)
-	}
-	if r.Dimensions != 0 {
-		opts["dimensions"] = r.Dimensions
-	}
-	input := r.ParseInput()
-	if len(input) == 1 {
-		return &OllamaEmbeddingRequest{Model: r.Model, Input: input[0], Options: opts, Dimensions: r.Dimensions}
-	}
-	return &OllamaEmbeddingRequest{Model: r.Model, Input: input, Options: opts, Dimensions: r.Dimensions}
-}
-
-func ollamaEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var oResp OllamaEmbeddingResponse
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	service.CloseResponseBodyGracefully(resp)
-	if err = common.Unmarshal(body, &oResp); err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	if oResp.Error != "" {
-		return nil, types.NewOpenAIError(fmt.Errorf("ollama error: %s", oResp.Error), types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	data := make([]dto.OpenAIEmbeddingResponseItem, 0, len(oResp.Embeddings))
-	for i, emb := range oResp.Embeddings {
-		data = append(data, dto.OpenAIEmbeddingResponseItem{Index: i, Object: "embedding", Embedding: emb})
-	}
-	usage := &dto.Usage{PromptTokens: oResp.PromptEvalCount, CompletionTokens: 0, TotalTokens: oResp.PromptEvalCount}
-	embResp := &dto.OpenAIEmbeddingResponse{Object: "list", Data: data, Model: info.UpstreamModelName, Usage: *usage}
-	out, _ := common.Marshal(embResp)
-	service.IOCopyBytesGracefully(c, resp, out)
-	return usage, nil
-}
+//
+//func requestOpenAI2Embeddings(r dto.EmbeddingRequest) *OllamaEmbeddingRequest {
+//	opts := map[string]any{}
+//	if r.Temperature != nil {
+//		opts["temperature"] = r.Temperature
+//	}
+//	if r.TopP != 0 {
+//		opts["top_p"] = r.TopP
+//	}
+//	if r.FrequencyPenalty != 0 {
+//		opts["frequency_penalty"] = r.FrequencyPenalty
+//	}
+//	if r.PresencePenalty != 0 {
+//		opts["presence_penalty"] = r.PresencePenalty
+//	}
+//	if r.Seed != 0 {
+//		opts["seed"] = int(r.Seed)
+//	}
+//	if r.Dimensions != 0 {
+//		opts["dimensions"] = r.Dimensions
+//	}
+//	input := r.ParseInput()
+//	if len(input) == 1 {
+//		return &OllamaEmbeddingRequest{Model: r.Model, Input: input[0], Options: opts, Dimensions: r.Dimensions}
+//	}
+//	return &OllamaEmbeddingRequest{Model: r.Model, Input: input, Options: opts, Dimensions: r.Dimensions}
+//}
+//
+//func ollamaEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
+//	var oResp OllamaEmbeddingResponse
+//	body, err := io.ReadAll(resp.Body)
+//	if err != nil {
+//		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+//	}
+//	service.CloseResponseBodyGracefully(resp)
+//	if err = common.Unmarshal(body, &oResp); err != nil {
+//		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+//	}
+//	if oResp.Error != "" {
+//		return nil, types.NewOpenAIError(fmt.Errorf("ollama error: %s", oResp.Error), types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+//	}
+//	data := make([]dto.OpenAIEmbeddingResponseItem, 0, len(oResp.Embeddings))
+//	for i, emb := range oResp.Embeddings {
+//		data = append(data, dto.OpenAIEmbeddingResponseItem{Index: i, Object: "embedding", Embedding: emb})
+//	}
+//	usage := &dto.Usage{PromptTokens: oResp.PromptEvalCount, CompletionTokens: 0, TotalTokens: oResp.PromptEvalCount}
+//	embResp := &dto.OpenAIEmbeddingResponse{Object: "list", Data: data, Model: info.UpstreamModelName, Usage: *usage}
+//	out, _ := common.Marshal(embResp)
+//	service.IOCopyBytesGracefully(c, resp, out)
+//	return usage, nil
+//}
